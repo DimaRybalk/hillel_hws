@@ -15,9 +15,10 @@ def square_int(some_int):
 def sum_nums(num1,num2):
     return num1+num2
 
-def divide_nums(num1,num2):
-    res = num1/num2
-    return float(res)
+def get_division_parts(num1, num2):
+    quotient = num1 // num2
+    remainder = num1 % num2
+    return quotient, remainder
 
 # Lists
 
