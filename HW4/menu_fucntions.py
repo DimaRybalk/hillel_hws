@@ -49,6 +49,31 @@ def add_product_to_order():
         except ValueError:
             print ("You should type only numbers")
 
+
+def delete_product_from_order():
+    current_order.show_order()
+
+    if not current_order.order_list:
+        return 
+
+    while True:
+        try:
+            user_choice = int(input("Which product you want to remove?: "))
+
+            if 0 < user_choice <= len(current_order.order_list):
+                target_product = current_order.order_list[user_choice - 1]
+                new_quantity = target_product.quantity + 1
+                target_product.set_new_quantity(new_quantity)
+                current_order.delete_product(target_product)
+                save_data(DATA_FILENAME, products)
+                current_order.calculate_total_cost()
+                print(f"{target_product.name} was removed")
+                break
+            else:
+                print("This order doesn't have this product")
+        except ValueError:
+            print ("You should type only numbers")
+
 def show_order():
     print("-" * 15)
     current_order.show_order()
@@ -85,7 +110,7 @@ def change_price():
                         target_product.set_new_price(new_price)
                         save_data(DATA_FILENAME,products)
                         return
-                    print("Price should be greater than 0")
+                    else: print("Price should be greater than 0")
                 except ValueError:
                     print("You should type only numbers")
             
@@ -105,7 +130,7 @@ def change_quantity():
                         target_product.set_new_quantity(new_quantity)
                         save_data(DATA_FILENAME,products)
                         return
-                    print("quantity should be greater than 0")
+                    else: print("quantity should be greater than 0")
                 except ValueError:
                     print("You should type only numbers")
         except ValueError:

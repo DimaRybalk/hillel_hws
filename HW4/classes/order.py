@@ -10,6 +10,9 @@ class Order:
     def add_product(self,product: "Product"):
         self.order_list.append(product)
 
+    def delete_product(self,product: "Product"):
+        self.order_list.pop(product)
+
     def show_order(self):
         if not self.order_list:
             print("Order list is empty")
