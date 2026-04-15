@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Детальная информация</h1>
+    
+    <div style="border: 1px solid #000; padding: 20px; width: 300px;">
+        <h2>{{ info.name }} ({{ coin_name }})</h2>
+        
+        <p><b>Цена:</b> ${{ info.price }}</p>
+        <p><b>Описание:</b> {{ info.desc }}</p>
+        
+        <a href="/coins">← Назад к списку</a>
+    </div>
+{% endblock %}

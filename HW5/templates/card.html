@@ -1,0 +1,7 @@
+{% macro coin_card(coin_name, info) %}
+<div style="border: 1px solid #ccc; padding: 10px; margin: 10px; border-radius: 8px; width: 200px; display: inline-block;">
+    <h3>{{ info.name }} ({{ coin_name }})</h3>
+    <p>Цена: <b>${{ info.price }}</b></p>
+    <a href="/coins/{{ coin_name }}">Подробнее</a>
+</div>
+{% endmacro %}

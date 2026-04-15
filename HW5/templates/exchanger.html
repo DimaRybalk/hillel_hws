@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Калькулятор</h1>
+
+    <form action="/exchanger" method="post">
+        
+        <input type="number" name="num" placeholder="Сумма в $">
+
+        <select name="currency">
+            {% for t in coins %}
+                <option {% if t == currency %}selected{% endif %}>
+                    {{ t }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Посчитать</button>
+    </form>
+
+    <hr>
+
+    {% if result %}
+        <h3>Результат: {{ result }} {{ currency }}</h3>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Добро пожаловать в CryptoHelper!</h1>
+    <p>Здесь ты найдешь актуальные данные о монетах.</p>
+
+    <p>Список представленых монет: </p>
+    
+    <ol>
+        {%for coin in coins.keys()%}
+        <li>{{coin}}</li>
+        {%endfor%}
+    </ol>
+    
+
+
+{% endblock %}

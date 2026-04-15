@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from "card.html" import coin_card %}
+{% block content %}
+    <h1>Список доступных монет</h1>
+    <ul>
+        {% for coin_name, info in coins.items() %}
+            <li>
+                {{ coin_card(coin_name, info) }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
