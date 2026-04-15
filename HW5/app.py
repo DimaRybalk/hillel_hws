@@ -13,15 +13,15 @@ crypto_db = {
     'DOT': {'name': 'Polkadot', 'price': 7.2, 'desc': 'Протокол для объединения разных блокчейнов.'}
 }
 
-@app.get("/")
+@app.route("/")
 def draw_index():
     return render_template("index.html",coins = crypto_db)
 
-@app.get("/coins")
+@app.route("/coins")
 def draw_coins():
     return render_template("coins.html", coins = crypto_db)
 
-@app.get("/coins/<coin_name>")
+@app.route("/coins/<coin_name>")
 def draw_one_coin(coin_name):
     data = crypto_db.get(coin_name.upper())
     if data:
