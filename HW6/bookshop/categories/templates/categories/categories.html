@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Список категорій</title>
+</head>
+<body>
+    <h1>Всі категорії</h1>
+    
+    <ul>
+        {% for cat in all_categories %}
+            <li>
+                <strong>{{ cat.name }}</strong> 
+                (Slug: {{ cat.slug }}) — 
+                Кількість книг: {{ cat.count_books }}
+            </li>
+        {% empty %}
+            <li>Категорій поки немає.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

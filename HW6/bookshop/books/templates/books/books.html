@@ -1,0 +1,29 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Список книг</title>
+    </head>
+    <body>
+        <h1>Список книг магазину</h1>
+        <ul>
+            {% for item in books%}
+                <li>
+                    Назва книги: {{item.title}}
+                    Категорія: {{item.category.name}}
+                    Автор: {{item.author}}
+                    Ціна: {{item.price}}
+
+                    Залишок: 
+                    {% if item.stock > 0 %}
+                        {{item.stock}} шт.
+                    {%else%} 
+                        <span style="color: red;">Книги нема в наявності</span>
+                    {% endif %}
+                </li>
+                <hr>
+            {%endfor%}
+        </ul>
+    </body>
+    </html>

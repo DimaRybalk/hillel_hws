@@ -1,0 +1,26 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Книга</title>
+    </head>
+    <body>
+        <ul>
+                <li>
+                    Назва книги: {{book_by_id.title}}
+                    Категорія: {{book_by_id.category.name}}
+                    Автор: {{book_by_id.author}}
+                    Ціна: {{book_by_id.price}}
+
+                    Залишок: 
+                    {% if book_by_id.stock > 0 %}
+                        {{book_by_id.stock}} шт.
+                    {%else%} 
+                        <span style="color: red;">Книги нема в наявності</span>
+                    {% endif %}
+                </li>
+                <hr>
+        </ul>
+    </body>
+    </html>
