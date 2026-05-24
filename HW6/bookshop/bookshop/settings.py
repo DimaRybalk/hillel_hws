@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'bookshop',
     'books.apps.BooksConfig',
     'categories.apps.CategoriesConfig',
+    'order.apps.OrderConfig',
+    # 'basket.apps.BasketConfig',
 ]
 
 MIDDLEWARE = [
@@ -61,7 +63,7 @@ ROOT_URLCONF = 'bookshop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,8 +83,16 @@ WSGI_APPLICATION = 'bookshop.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'crypto_db',  # Назва бази, яку видно на скріншоті
+        'USER': 'postgres',    # Твій стандартний користувач
+        'PASSWORD': 'd051102rybalko',
+        'HOST': '127.0.0.1',
+        'PORT': '5433',
+        'OPTIONS': {
+            # Це змусить Django використовувати твою схему CRM замість public
+            'options': '-c search_path=CRM,public'
+        },
     }
 }
 

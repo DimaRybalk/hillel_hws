@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Редагувати книгу "{{ book.title }}"{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">✏️ Редагування книги: "{{ book.title }}"</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="django-form-inputs">
+                        {{ form.as_p }}
+                    </div>
+                    
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-warning px-4">Зберегти зміни</button>
+                        <a href="{% url 'books_list' %}" class="btn btn-outline-secondary">Скасувати</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.querySelectorAll('.django-form-inputs input, .django-form-inputs textarea').forEach(function(el) {
+        if (el.type !== 'checkbox') {
+            el.classList.add('form-control');
+        } else {
+            el.classList.add('form-check-input');
+        }
+    });
+</script>
+{% endblock %}

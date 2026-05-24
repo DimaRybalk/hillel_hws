@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Зберегти категорію{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Форма категорії</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="django-form-inputs mb-3">
+                        {{ form.as_p }}
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success px-4">Зберегти</button>
+                        <a href="{% url 'categories_list' %}" class="btn btn-outline-secondary">Скасувати</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.django-form-inputs input').forEach(function(el) {
+        el.classList.add('form-control');
+    });
+</script>
+{% endblock %}

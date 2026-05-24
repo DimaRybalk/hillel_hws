@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Видалення категорії{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">⚠️ Видалення категорії</h4>
+            </div>
+            <div class="card-body text-center p-4">
+                <p class="fs-5">Ви впевнені, що хочете видалити категорію:</p>
+                <h2 class="text-danger my-3">"{{ category.name }}"</h2>
+                
+            
+                <p class="text-muted bg-light p-3 rounded border">
+                    <strong>Зверніть увагу:</strong> Самі книги видалені не будуть. Вони просто відв'яжуться від цієї категорії.
+                </p>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <button type="submit" class="btn btn-danger px-4">Так, видалити безповоротно</button>
+                        <a href="{% url 'categories_list' %}" class="btn btn-outline-secondary px-4">Ні, скасувати</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,26 +1,44 @@
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Книга</title>
-    </head>
-    <body>
-        <ul>
-                <li>
-                    Назва книги: {{book_by_id.title}}
-                    Категорія: {{book_by_id.category.name}}
-                    Автор: {{book_by_id.author}}
-                    Ціна: {{book_by_id.price}}
+{% extends 'base.html' %}
 
-                    Залишок: 
-                    {% if book_by_id.stock > 0 %}
-                        {{book_by_id.stock}} шт.
-                    {%else%} 
-                        <span style="color: red;">Книги нема в наявності</span>
-                    {% endif %}
-                </li>
+{% block title %}{{ book.title }} - Деталі{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ book.title }}</h4>
+                <span class="badge bg-success fs-5">{{ book.price }} грн</span>
+            </div>
+            <div class="card-body p-4">
+                <h5 class="text-muted mb-3">Автор: <strong>{{ book.author }}</strong></h5>
+                
                 <hr>
-        </ul>
-    </body>
-    </html>
+                
+                <p class="card-text fs-5"><strong>Опис:</strong></p>
+                <p class="text-secondary" style="white-space: pre-line;">{{ book.description|default:"Опис відсутній." }}</p>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        <strong>Категорії:</strong> 
+                        {% for cat in book.category.all %}
+                            <span class="badge bg-secondary me-1">{{ cat.name }}</span>
+                        {% empty %}
+                            <span class="text-muted">Немає категорій</span>
+                        {% endfor %}
+                    </div>
+                    <span class="text-muted">Залишок на складі: <strong>{{ book.stock }} шт.</strong></span>
+                </div>
+            </div>
+            <div class="card-footer bg-light d-flex gap-2 justify-content-end p-3">
+                <a href="{% url 'books_list' %}" class="btn btn-outline-secondary me-auto">Назад до списку</a>
+                
+                <a href="{% url 'book_update' book.id %}" class="btn btn-warning">✏️ Редагувати</a>
+                <a href="{% url 'book_delete' book.id %}" class="btn btn-danger">🗑️ Видалити книгу</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

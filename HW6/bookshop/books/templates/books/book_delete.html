@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Видалення книги{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">⚠️ Підтвердження видалення</h4>
+            </div>
+            <div class="card-body text-center p-4">
+                <p class="fs-5">Ви впевнені, що хочете безповоротно видалити книгу:</p>
+                <h3 class="text-danger my-3">"{{ book.title }}"</h3>
+                <p class="text-muted small">Цю дію не можна буде скасувати.</p>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <button type="submit" class="btn btn-danger px-4">Так, видалити</button>
+                        <a href="{% url 'books_list' %}" class="btn btn-outline-secondary px-4">Ні, скасувати</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

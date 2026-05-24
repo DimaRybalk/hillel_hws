@@ -19,13 +19,16 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from books.views import get_all_books
+# from books.views import get_all_books
+from books.views import BooksView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', get_all_books),
+    path('', BooksView.as_view()),
     path('categories/', include('categories.urls')),
     path('books/',include('books.urls')), 
+    path('orders/',include('order.urls')),
+    path('basket/',include('basket.urls'))
 ]
 
 
