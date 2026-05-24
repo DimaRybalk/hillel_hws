@@ -17,6 +17,11 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=10,decimal_places=2,default=0.00, blank=True)
     status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='new')
 
+    class Meta:
+        ordering = ['-created_at'] 
+        verbose_name = "Замовлення"
+        verbose_name_plural = "Замовлення"
+
     def update_total_price(self):
         self.total_price = sum(item.price * item.quantity for item in self.items.all())
         self.save() 

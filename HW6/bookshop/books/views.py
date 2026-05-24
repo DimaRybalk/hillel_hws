@@ -68,13 +68,24 @@ class BooksView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['all_categories'] = Category.objects.all()
-        
+        context['cart'] = self.request.session.get('cart', {})
+
         return context
 
 class OneBookView(DetailView):
     model = Book
     template_name = 'books/book_detail.html'
     context_object_name = 'book'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        cart = self.request.session.get('cart', {})
+        book = context['book']
+    
+        book.cart_quantity = cart.get(str(book.id), 0)
+        
+        return context
 
 class CreateBookView(CreateView):
     model = Book

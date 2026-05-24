@@ -9,8 +9,9 @@ class OrdersListView(ListView):
     paginate_by = 10
     template_name = 'order/orders.html'
     context_object_name = 'orders'
+    
 
-    def det_queryset(self):
+    def get_queryset(self):
         return Order.objects.select_related('user').all()
 
 class OneOrderView(DetailView):

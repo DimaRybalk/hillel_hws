@@ -5,38 +5,61 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">{{ book.title }}</h4>
-                <span class="badge bg-success fs-5">{{ book.price }} грн</span>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                <h4 class="mb-0 fw-bold">{{ book.title }}</h4>
+                <span class="badge bg-success fs-5 shadow-sm">{{ book.price }} грн</span>
             </div>
-            <div class="card-body p-4">
-                <h5 class="text-muted mb-3">Автор: <strong>{{ book.author }}</strong></h5>
+            
+            <div class="card-body p-4 bg-white">
+                <h5 class="text-muted mb-3">Автор: <strong class="text-dark">{{ book.author }}</strong></h5>
                 
-                <hr>
+                <hr class="text-muted">
                 
-                <p class="card-text fs-5"><strong>Опис:</strong></p>
-                <p class="text-secondary" style="white-space: pre-line;">{{ book.description|default:"Опис відсутній." }}</p>
+                <p class="card-text fs-5 fw-bold text-dark">Опис:</p>
+                <p class="text-secondary" style="white-space: pre-line; line-height: 1.6;">
+                    {{ book.description|default:"Опис відсутній." }}
+                </p>
                 
-                <hr>
+                <hr class="text-muted">
                 
                 <div class="d-flex justify-content-between align-items-center mt-4">
                     <div>
-                        <strong>Категорії:</strong> 
+                        <strong class="text-secondary me-2">Категорії:</strong> 
                         {% for cat in book.category.all %}
-                            <span class="badge bg-secondary me-1">{{ cat.name }}</span>
+                            <span class="badge bg-secondary me-1 py-2 px-2">{{ cat.name }}</span>
                         {% empty %}
-                            <span class="text-muted">Немає категорій</span>
+                            <span class="text-muted small">Немає категорій</span>
                         {% endfor %}
                     </div>
-                    <span class="text-muted">Залишок на складі: <strong>{{ book.stock }} шт.</strong></span>
+                    <span class="text-muted">Залишок на складі: <strong class="text-dark">{{ book.stock }} шт.</strong></span>
                 </div>
             </div>
-            <div class="card-footer bg-light d-flex gap-2 justify-content-end p-3">
+            
+            <div class="card-footer bg-light d-flex gap-2 justify-content-end align-items-center p-3 border-top">
                 <a href="{% url 'books_list' %}" class="btn btn-outline-secondary me-auto">Назад до списку</a>
                 
-                <a href="{% url 'book_update' book.id %}" class="btn btn-warning">✏️ Редагувати</a>
-                <a href="{% url 'book_delete' book.id %}" class="btn btn-danger">🗑️ Видалити книгу</a>
+                <div style="min-width: 160px;">
+                    {% if book.cart_quantity > 0 %}
+                        <div class="d-flex align-items-center justify-content-between bg-white rounded border p-1 shadow-sm">
+                            <button class="btn btn-sm btn-outline-secondary px-2 py-1 fw-bold border-0" 
+                                    onclick="cartAction('{% url 'delete_one_book' book.id %}', '{{ book.id }}', 'decrease')">-</button>
+                            
+                            <span class="fw-bold text-dark px-2">{{ book.cart_quantity }} шт.</span>
+                            
+                            <button class="btn btn-sm btn-outline-secondary px-2 py-1 fw-bold border-0" 
+                                    onclick="cartAction('{% url 'add_to_cart' book.id %}', '{{ book.id }}', 'increase')">+</button>
+                        </div>
+                    {% else %}
+                        <button class="btn btn-primary fw-bold px-4 shadow-sm" 
+                                onclick="cartAction('{% url 'add_to_cart' book.id %}', '{{ book.id }}', 'add_from_catalog')">
+                            🛒 Купити
+                        </button>
+                    {% endif %}
+                </div>
+                
+                <a href="{% url 'book_update' book.id %}" class="btn btn-outline-warning">✏️ Редагувати</a>
+                <a href="{% url 'book_delete' book.id %}" class="btn btn-outline-danger">🗑️ Видалити</a>
             </div>
         </div>
     </div>

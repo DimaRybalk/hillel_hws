@@ -67,8 +67,36 @@
                             </div>
                         </div>
                         
-                        <div class="card-footer bg-transparent border-top-0 d-flex gap-2 pb-3">
-                            <a href="{% url 'book_detail' book.id %}" class="btn btn-outline-info btn-sm flex-grow-1">Детальніше</a>
+                        <div class="card-footer bg-transparent border-top-0 d-flex gap-2 pb-3 align-items-center">
+                            <a href="{% url 'book_detail' book.id %}" class="btn btn-outline-info btn-sm">Детальніше</a>
+                            
+                            <div class="flex-grow-1 d-flex justify-content-center">
+                                {% with book_id_str=book.id|slugify %}
+                                    
+                                    {% if book_id_str in cart %}
+                                        <div class="d-flex align-items-center justify-content-between w-100 bg-light rounded border p-1">
+                                            <button class="btn btn-sm btn-outline-secondary px-2 py-0 fw-bold border-0" 
+                                                    onclick="cartAction('{% url 'delete_one_book' book.id %}', '{{ book.id }}', 'decrease')">-</button>
+                                            
+                                            <span class="fw-bold text-dark small">
+                                                {% for key, value in cart.items %}
+                                                    {% if key == book_id_str %}{{ value }} шт.{% endif %}
+                                                {% endfor %}
+                                            </span>
+                                            
+                                            <button class="btn btn-sm btn-outline-secondary px-2 py-0 fw-bold border-0" 
+                                                    onclick="cartAction('{% url 'add_to_cart' book.id %}', '{{ book.id }}', 'increase')">+</button>
+                                        </div>
+                                    {% else %}
+                                        <button class="btn btn-primary btn-sm w-100 fw-bold" 
+                                                onclick="cartAction('{% url 'add_to_cart' book.id %}', '{{ book.id }}', 'add_from_catalog')">
+                                            🛒 Купити
+                                        </button>
+                                    {% endif %}
+
+                                {% endwith %}
+                            </div>
+
                             <a href="{% url 'book_update' book.id %}" class="btn btn-outline-warning btn-sm">✏️</a>
                             <a href="{% url 'book_delete' book.id %}" class="btn btn-outline-danger btn-sm">🗑️</a>
                         </div>
