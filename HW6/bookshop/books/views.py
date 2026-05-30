@@ -8,7 +8,9 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView,DeleteView,UpdateView
 from django.forms import CheckboxSelectMultiple
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from silk.profiling.profiler import silk_profile
+import logging
 # ---------------------------- Function-Based Views -----------------------------------------
 
 # def get_all_books(request):
@@ -32,6 +34,9 @@ from django.forms import CheckboxSelectMultiple
 
 
 # ---------------------------- Class-Based Views -----------------------------------------
+
+
+logger = logging.getLogger('books_list_logger')
 
 class BookForm(forms.ModelForm):
     class Meta:
@@ -87,19 +92,25 @@ class OneBookView(DetailView):
         
         return context
 
-class CreateBookView(CreateView):
+class CreateBookView(PermissionRequiredMixin,CreateView):
     model = Book
     form_class = BookForm
     template_name = 'books/book_create_form.html'
     success_url = reverse_lazy('books_list')
 
-class DeleteBookView(DeleteView):
+    permission_required = 'books.add_book'
+
+class DeleteBookView(PermissionRequiredMixin,DeleteView):
     model = Book
     template_name = 'books/book_delete.html'
     success_url = reverse_lazy('books_list')
 
-class UpdateBookView(UpdateView):
+    permission_required = 'books.delete_book'
+
+class UpdateBookView(PermissionRequiredMixin,UpdateView):
     model = Book
     form_class = BookForm
     template_name = 'books/book_update_form.html'
     success_url = reverse_lazy('books_list')
+
+    permission_required = 'books.update_book'

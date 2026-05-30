@@ -5,7 +5,9 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Управління категоріями</h2>
+    {% if perms.categories.add_category %}
     <a href="{% url 'category_add' %}" class="btn btn-primary">+ Додати категорію</a>
+    {%endif%}
 </div>
 
 <div class="card shadow-sm">
@@ -15,7 +17,9 @@
                 <tr>
                     <th scope="col" class="ps-4">#</th>
                     <th scope="col">Назва категорії</th>
+                    {% if perms.categories.update_category%}
                     <th scope="col" class="text-end pe-4">Дії</th>
+                    {%endif%}
                 </tr>
             </thead>
             <tbody>
@@ -28,10 +32,12 @@
                                 {{ category.name }}
                             </a>
                         </td>
+                        {% if perms.categories.update_category %}
                         <td class="text-end pe-4">
                             <a href="{% url 'category_edit' category.id %}" class="btn btn-sm btn-outline-warning me-1">✏️ Редагувати</a>
                             <a href="{% url 'category_delete' category.id %}" class="btn btn-sm btn-outline-danger">🗑️ Видалити</a>
                         </td>
+                        {%endif%}
                     </tr>
                 {% empty %}
                     <tr>

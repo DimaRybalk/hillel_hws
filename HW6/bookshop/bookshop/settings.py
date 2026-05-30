@@ -41,11 +41,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'user.apps.UserConfig',
     'bookshop',
     'books.apps.BooksConfig',
     'categories.apps.CategoriesConfig',
     'order.apps.OrderConfig',
     'basket.apps.BasketConfig',
+    'silk',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    
 ]
 
 MIDDLEWARE = [
@@ -56,6 +64,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'bookshop.urls'
@@ -83,16 +93,8 @@ WSGI_APPLICATION = 'bookshop.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'crypto_db',  # Назва бази, яку видно на скріншоті
-        'USER': 'postgres',    # Твій стандартний користувач
-        'PASSWORD': 'd051102rybalko',
-        'HOST': '127.0.0.1',
-        'PORT': '5433',
-        'OPTIONS': {
-            # Це змусить Django використовувати твою схему CRM замість public
-            'options': '-c search_path=CRM,public'
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -139,3 +141,77 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+AUTH_USER_MODEL = 'user.CustomUser'
+
+LOGIN_REDIRECT_URL = 'books_list'
+LOGOUT_REDIRECT_URL = 'books_list'
+LOGIN_URL = 'login'
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_DETAILS_AUTO_SIGNUP = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+SOCIALACCOUNT_AUTO_SIGNUP = True
+ACCOUNT_USERNAME_VALIDATORS = None
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'user.adapter.MyCustomSocialAccountAdapter'
+
+SILK_AUTHENTICATION = True  
+SILK_AUTHORIZATION = True
+
+LOGS_DIR = BASE_DIR / 'logs'
+if not LOGS_DIR.exists():
+    os.makedirs(LOGS_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} [{levelname}] {name} (Рядок: {lineno}): {message}',
+            'style': '{',
+        },
+    },
+   
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file_orders': {
+            'class': 'logging.FileHandler',
+            'filename': LOGS_DIR / 'orders.log',
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
+        'file_users': {
+        'class': 'logging.FileHandler',
+        'filename': LOGS_DIR / 'users.log',
+        'formatter': 'verbose',
+        'encoding': 'utf-8',
+        },
+    },
+    
+    'loggers': {
+        
+        'order_logger': {
+            'handlers': ['console', 'file_orders'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'user_logger': {
+        'handlers': ['console', 'file_users'],
+        'level': 'INFO',
+        'propagate': True,
+        },
+    },
+}

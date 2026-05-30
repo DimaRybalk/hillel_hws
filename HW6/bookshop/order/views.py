@@ -1,8 +1,14 @@
 # from django.shortcuts import render
+
+
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
 from .models import Order
+
+
+
+
 
 class OrdersListView(ListView):
     model = Order
@@ -12,7 +18,7 @@ class OrdersListView(ListView):
     
 
     def get_queryset(self):
-        return Order.objects.select_related('user').all()
+        return Order.objects.select_related('user').filter(user=self.request.user).order_by('-id')
 
 class OneOrderView(DetailView):
     model = Order

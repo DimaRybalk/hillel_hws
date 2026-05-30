@@ -36,8 +36,13 @@
             
         
             <div class="card-footer bg-light d-flex gap-2 justify-content-end p-3">
+                
+                {% if perms.categories.update_category%}
                 <a href="{% url 'category_edit' category.id %}" class="btn btn-warning">✏️ Редагувати назву</a>
+                {%endif%}
+                {% if perms.categories.delete_category%}
                 <a href="{% url 'category_delete' category.id %}" class="btn btn-danger">🗑️ Видалити категорію</a>
+                {%endif%}
             </div>
         </div>
     </div>

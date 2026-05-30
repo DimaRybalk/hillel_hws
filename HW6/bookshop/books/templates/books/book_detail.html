@@ -57,9 +57,12 @@
                         </button>
                     {% endif %}
                 </div>
-                
+                {% if perms.books.update_book%}
                 <a href="{% url 'book_update' book.id %}" class="btn btn-outline-warning">✏️ Редагувати</a>
+                {%endif%}
+                {% if perms.books.delete_book%}
                 <a href="{% url 'book_delete' book.id %}" class="btn btn-outline-danger">🗑️ Видалити</a>
+                {%endif%}
             </div>
         </div>
     </div>

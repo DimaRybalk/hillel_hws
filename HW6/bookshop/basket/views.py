@@ -5,6 +5,14 @@ from books.models import Book
 from order.models import Order, OrderItem
 from .services import SessionCart
 from django.contrib import messages
+from silk.profiling.profiler import silk_profile
+from django.contrib.auth.mixins import LoginRequiredMixin
+import logging
+
+
+
+
+logger = logging.getLogger('order_logger')
 
 class AddToCartView(View):
     def post(self,request,book_id):
@@ -39,7 +47,9 @@ class GetCartData(View):
         cart_data = cart.get_cart_data()
         return render(request, 'basket/basket_detail.html', context=cart_data)
 
-class SubmitCartView(View):
+class SubmitCartView(LoginRequiredMixin,View):
+
+    @silk_profile(name='Оформлення замовлення (Submit Cart)')
     def post(self,request):
         cart = SessionCart(request)
         cart_data = cart.get_cart_data()
@@ -73,5 +83,10 @@ class SubmitCartView(View):
             )
 
         cart.clear_cart()
+
+        logger.info(
+                    f"УСПІХ: Користувач {order.user.username} (ID: {order.user.id}) створив замовлення №{order.id} "
+                    f"на суму {order.total_price} грн. Кількість позицій: {len(cart_data['cart_items'])}"
+                )
 
         return redirect('order_detail', pk=order.id)

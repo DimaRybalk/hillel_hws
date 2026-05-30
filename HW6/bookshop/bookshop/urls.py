@@ -28,10 +28,14 @@ urlpatterns = [
     path('categories/', include('categories.urls')),
     path('books/',include('books.urls')), 
     path('orders/',include('order.urls')),
-    path('basket/',include('basket.urls'))
+    path('basket/',include('basket.urls')),
+    path('user/',include('user.urls')),
+    path('accounts/', include('allauth.urls')),
+    path('silk/', include('silk.urls', namespace='silk')),
+    
 ]
 
 
-# Дозволяє бачити фотографії на сайті і працювати з ними
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

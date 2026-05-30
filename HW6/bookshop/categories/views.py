@@ -5,6 +5,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView,DeleteView,UpdateView
 from django.db.models import Count
 from categories.models import Category
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 # -------------------------------- Function-Based Views ----------------------------------
 
@@ -28,11 +29,13 @@ class CategoriesView(ListView):
     def get_queryset(self):
         return Category.objects.annotate(count_books=Count('books', distinct=True)).order_by('name')
 
-class CategoryCreateView(CreateView):
+class CategoryCreateView(PermissionRequiredMixin,CreateView):
     model = Category
     fields = ['name']
     template_name = 'categories/categories_create_form.html'
     success_url = reverse_lazy('categories_list')
+
+    permission_required = 'categories.add_category'
 
 
 class OneCategoryView(DetailView):
@@ -44,16 +47,19 @@ class OneCategoryView(DetailView):
         return Category.objects.annotate(count_books=Count('books', distinct=True)).order_by('name')
 
 
-class CategoryDeleteView(DeleteView):
+class CategoryDeleteView(PermissionRequiredMixin,DeleteView):
     model = Category
     template_name = 'categories/category_confirm_delete.html'
     success_url = reverse_lazy('categories_list')
 
+    permission_required = 'categories.delete_category'
 
-class CategoryUpdateView(UpdateView):
+class CategoryUpdateView(PermissionRequiredMixin,UpdateView):
     model = Category
     template_name = 'categories/categories_update_form.html'
     fields = ['name']
     success_url = reverse_lazy('categories_list')
+
+    permission_required = 'categories.update_category'
 
 

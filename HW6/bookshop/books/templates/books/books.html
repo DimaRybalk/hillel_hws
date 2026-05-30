@@ -96,9 +96,12 @@
 
                                 {% endwith %}
                             </div>
-
+                            {% if perms.books.update_book%}
                             <a href="{% url 'book_update' book.id %}" class="btn btn-outline-warning btn-sm">✏️</a>
+                            {%endif%}
+                            {% if perms.books.delete_book%}
                             <a href="{% url 'book_delete' book.id %}" class="btn btn-outline-danger btn-sm">🗑️</a>
+                            {%endif%}
                         </div>
                     </div>
                 </div>
