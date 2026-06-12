@@ -98,16 +98,16 @@ WSGI_APPLICATION = 'bookshop.wsgi.application'
 #     }
 # }
 
-IS_DOCKER = os.path.exists('/.dockerenv')
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'book_base'),
-        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'd051102rybalko'),
-        'HOST': 'db' if IS_DOCKER else 'localhost',
-        'PORT': '5432' if IS_DOCKER else '5433',
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
 
@@ -228,7 +228,3 @@ LOGGING = {
         },
     },
 }
-
-
-# 591815799220-ar89ev4c7mmddcf4lnre3aancgadhncq.apps.googleusercontent.com
-# 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
