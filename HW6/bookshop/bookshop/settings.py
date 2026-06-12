@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=False)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -91,10 +91,23 @@ WSGI_APPLICATION = 'bookshop.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+IS_DOCKER = os.path.exists('/.dockerenv')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB', 'book_base'),
+        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'd051102rybalko'),
+        'HOST': 'db' if IS_DOCKER else 'localhost',
+        'PORT': '5432' if IS_DOCKER else '5433',
     }
 }
 
@@ -215,3 +228,7 @@ LOGGING = {
         },
     },
 }
+
+
+# 591815799220-ar89ev4c7mmddcf4lnre3aancgadhncq.apps.googleusercontent.com
+# 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
