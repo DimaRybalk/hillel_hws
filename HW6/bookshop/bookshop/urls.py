@@ -32,6 +32,7 @@ urlpatterns = [
     path('user/',include('user.urls')),
     path('accounts/', include('allauth.urls')),
     path('silk/', include('silk.urls', namespace='silk')),
+    path('payments/', include('payments.urls')),
     
 ]
 

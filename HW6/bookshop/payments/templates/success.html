@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Оплата успішна!{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <div class="card shadow-sm border-0 p-5 rounded-3">
+            <div class="card-body">
+                <div class="display-1 text-success mb-4">
+                    <i class="bi bi-check-circle-fill">✅</i>
+                </div>
+                <h2 class="fw-bold text-dark mb-3">Дякуємо за покупку!</h2>
+                <p class="text-muted fs-5 mb-4">
+                    Ваша оплата успішно зарахована через Stripe. Книжки вже чекають на вас у вашому особистому кабінеті.
+                </p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="{% url 'books_list' %}" class="btn btn-primary btn-lg px-4 gap-3">Перейти до каталогу</a>
+                    <a href="{% url 'orders_list' %}" class="btn btn-outline-secondary btn-lg px-4">Історія замовлень</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

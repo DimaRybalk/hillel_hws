@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from stripe import StripeClient
 
 load_dotenv(override=False)
 
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'payments.apps.PaymentsConfig'
     
 ]
 
@@ -106,8 +108,8 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB'),
         'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
-        'PORT': '5432',
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
 
@@ -228,3 +230,20 @@ LOGGING = {
         },
     },
 }
+
+client_api = os.environ.get('STRIPE_CLIENT_API')
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+
+EMAIL_HOST_USER = 'dima.rubaka1@gmail.com'
+
+
+EMAIL_HOST_PASSWORD = 'raklmhegzpvcyolw' 
+
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

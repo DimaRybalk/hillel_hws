@@ -11,3 +11,7 @@
 2026-06-12 16:24:48,904 [INFO] user_logger (Рядок: 17): НОВИЙ КОРИСТУВАЧ (GOOGLE): Зареєстровано через Google. Username: dima.rubaka1, Email: dima.rubaka1@gmail.com, ID: None
 2026-06-12 16:37:04,797 [INFO] user_logger (Рядок: 58): ВИХІД: Користувач dima.rubaka1 (ID: 2) вийшов із системи.
 2026-06-12 16:37:13,250 [INFO] user_logger (Рядок: 37): АВТОРИЗАЦІЯ: Користувач admin (ID: 1) увійшов через форму.
+2026-06-17 22:42:10,584 [INFO] user_logger (Рядок: 37): АВТОРИЗАЦІЯ: Користувач admin (ID: 1) увійшов через форму.
+2026-06-20 22:52:15,212 [INFO] user_logger (Рядок: 58): ВИХІД: Користувач admin (ID: 1) вийшов із системи.
+2026-06-20 22:52:33,995 [INFO] user_logger (Рядок: 17): НОВИЙ КОРИСТУВАЧ (GOOGLE): Зареєстровано через Google. Username: dima.rubaka1, Email: dima.rubaka1@gmail.com, ID: None
+2026-06-23 00:12:22,177 [INFO] user_logger (Рядок: 37): АВТОРИЗАЦІЯ: Користувач admin (ID: 1) увійшов через форму.
