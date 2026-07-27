@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Ваш Кошик - BookStore{% endblock %}
+{% block title %}{% translate "Ваш Кошик" %} - BookStore{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">🛒 Ваш кошик</h2>
+    <h2 class="mb-4">🛒 {% translate "Ваш кошик" %}</h2> 
 
     {% if cart_items %}
         <div class="row">
@@ -14,10 +15,10 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th scope="col" class="ps-4 py-3">Книга</th>
-                                    <th scope="col">Ціна</th>
-                                    <th scope="col" class="text-center" style="width: 140px;">Кількість</th>
-                                    <th scope="col">Сума</th>
+                                    <th scope="col" class="ps-4 py-3">{% translate "Книга" %}</th>
+                                    <th scope="col">{% translate "Ціна" %}</th>
+                                    <th scope="col" class="text-center" style="width: 140px;">{% translate "Кількість" %}</th>
+                                    <th scope="col">{% translate "Сума" %}</th>
                                     <th scope="col" class="text-center"></th>
                                 </tr>
                             </thead>
@@ -30,28 +31,28 @@
                                                     {{ item.book.title }}
                                                 </a>
                                             </h6>
-                                            <small class="text-muted">Автор: {{ item.book.author }}</small>
+                                            <small class="text-muted">{% translate "Автор:" %} {{ item.book.author }}</small>
                                         </td>
                                         
-                                        <td>{{ item.book.price }} грн</td>
+                                        <td>{{ item.book.price }} {% translate "грн" %}</td>
                                         
                                         <td class="text-center">
                                             <div class="d-flex align-items-center justify-content-between bg-light rounded border p-1">
                                                 <button class="btn btn-sm px-2 py-0 fw-bold border-0 text-secondary" 
-                                                        onclick="cartAction('/basket/delete_one_book/{{ item.book.id }}/', '{{ item.book.id }}', 'decrease')">-</button>
+                                                        onclick="cartAction('{% url 'delete_one_book' item.book.id %}', '{{ item.book.id }}', 'decrease')">-</button>
                                                 
                                                 <span class="fw-bold text-dark small mx-2">{{ item.quantity }}</span>
                                                 
                                                 <button class="btn btn-sm px-2 py-0 fw-bold border-0 text-secondary" 
-                                                        onclick="cartAction('/basket/add/{{ item.book.id }}/', '{{ item.book.id }}', 'increase')">+</button>
+                                                        onclick="cartAction('{% url 'add_to_cart' item.book.id %}', '{{ item.book.id }}', 'increase')">+</button>
                                             </div>
                                         </td>
                                         
-                                        <td class="fw-bold text-primary">{{ item.item_total }} грн</td>
+                                        <td class="fw-bold text-primary">{{ item.item_total }} {% translate "грн" %}</td>
                                         
                                         <td class="text-center pe-4">
                                             <button class="btn btn-outline-danger btn-sm border-0" 
-                                                    onclick="cartAction('/basket/delete/{{ item.book.id }}/', '{{ item.book.id }}', 'delete_full')">
+                                                    onclick="cartAction('{% url 'delete_book' item.book.id %}', '{{ item.book.id }}', 'delete_full')">
                                                 🗑️
                                             </button>
                                         </td>
@@ -65,25 +66,25 @@
 
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0 bg-white p-4">
-                    <h4 class="fw-bold mb-3 text-dark">Підсумок замовлення</h4>
+                    <h4 class="fw-bold mb-3 text-dark">{% translate "Підсумок замовлення" %}</h4>
                     
                     <div class="d-flex justify-content-between align-items-center mb-4 border-top pt-3">
-                        <span class="text-muted fs-5">До сплати:</span>
-                        <span class="fs-3 fw-bold text-success">{{ cart_price }} грн</span>
+                        <span class="text-muted fs-5">{% translate "До сплати:" %}</span>
+                        <span class="fs-3 fw-bold text-success">{{ cart_price }} {% translate "грн" %}</span>
                     </div>
                     
                     <div class="d-grid gap-2">
                         {% if request.user.is_authenticated %}
                             <form action="{% url 'submit_cart' %}" method="POST" class="d-grid">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm py-2">Оформити замовлення</button>
+                                <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm py-2">{% translate "Оформити замовлення" %}</button>
                             </form>
                         {% else %}
                             <button type="button" class="btn btn-success btn-lg fw-bold shadow-sm py-2" data-bs-toggle="modal" data-bs-target="#authRequiredModal">
-                                Оформити замовлення
+                                {% translate "Оформити замовлення" %}
                             </button>
                         {% endif %}
-                        <a href="{% url 'books_list' %}" class="btn btn-outline-secondary btn-sm py-2">Продовжити покупки</a>
+                        <a href="{% url 'books_list' %}" class="btn btn-outline-secondary btn-sm py-2">{% translate "Продовжити покупки" %}</a>
                     </div>
                 </div>
             </div>
@@ -92,9 +93,9 @@
         <div class="row justify-content-center">
             <div class="col-md-6 text-center py-5">
                 <div class="display-1 mb-3">🛒</div>
-                <h3 class="fw-bold text-secondary">Ваш кошик порожній</h3>
-                <p class="text-muted mb-4">Ви ще не додали жодної книги до свого замовлення.</p>
-                <a href="{% url 'books_list' %}" class="btn btn-primary px-4 py-2 fw-bold shadow-sm">Перейти до каталогу</a>
+                <h3 class="fw-bold text-secondary">{% translate "Ваш кошик порожній" %}</h3>
+                <p class="text-muted mb-4">{% translate "Ви ще не додали жодної книги до свого замовлення." %}</p>
+                <a href="{% url 'books_list' %}" class="btn btn-primary px-4 py-2 fw-bold shadow-sm">{% translate "Перейти до каталогу" %}</a>
             </div>
         </div>
     {% endif %}
@@ -107,32 +108,31 @@
             
             <div class="modal-header bg-warning text-dark border-0">
                 <h5 class="modal-title fw-bold" id="authRequiredModalLabel">
-                    🔒 Потрібна авторизація
+                    🔒 {% translate "Потрібна авторизація" %}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
             <div class="modal-body p-4 text-center">
                 <p class="fs-5 text-secondary mb-4">
-                    Щоб завершити покупку та оформити замовлення, будь ласка, увійдіть у свій акаунт або зареєструйтеся.
+                    {% translate "Щоб завершити покупку та оформити замовлення, будь ласка, увійдіть у свій акаунт або зареєструйтеся." %}
                 </p>
                 <div class="d-grid gap-2">
                     <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-success btn-lg fw-bold shadow-sm">
-                        Увійти в систему
+                        {% translate "Увійти в систему" %}
                     </a>
                     <a href="{% url 'register' %}" class="btn btn-outline-secondary">
-                        Створити новий акаунт
+                        {% translate "Створити новий акаунт" %}
                     </a>
                 </div>
             </div>
             
             <div class="modal-footer justify-content-center border-0 text-muted small bg-light py-2">
-                📚 BookStore &copy; 2026 | Навчальний проєкт Django
+                📚 BookStore &copy; 2026 | {% translate "Навчальний проєкт Django" %}
             </div>
             
         </div>
     </div>
 </div>
 {% endif %}
-
 {% endblock %}

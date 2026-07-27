@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-
-{% block title %}Список книг - BookStore{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Список книг - BookStore" %}{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -9,21 +9,21 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-dark text-white py-3">
                 <h5 class="card-title mb-0 d-flex align-items-center">
-                    <span class="me-2">🎛️</span> Фільтри
+                    <span class="me-2">🎛️</span> {% translate "Фільтри" %}
                 </h5>
             </div>
             <div class="card-body p-3 bg-white rounded-bottom">
                 <form method="get" action="{% url 'books_list' %}">
                     
                     <div class="mb-3">
-                        <label for="search" class="form-label fw-bold text-secondary small text-uppercase">Пошук за назвою</label>
-                        <input type="text" name="q" id="search" class="form-control" placeholder="Введіть назву..." value="{{ request.GET.q }}">
+                        <label for="search" class="form-label fw-bold text-secondary small text-uppercase">{% translate "Пошук за назвою" %}</label>
+                        <input type="text" name="q" id="search" class="form-control" placeholder="{% translate 'Введіть назву...' %}" value="{{ request.GET.q }}">
                     </div>
 
                     <div class="mb-3">
-                        <label for="category-filter" class="form-label fw-bold text-secondary small text-uppercase">Категорія</label>
+                        <label for="category-filter" class="form-label fw-bold text-secondary small text-uppercase">{% translate "Категорія" %}</label>
                         <select name="cat" id="category-filter" class="form-select">
-                            <option value="">Всі категорії</option>
+                            <option value="">{% translate "Всі категорії" %}</option>
                             {% for cat in all_categories %}
                                 <option value="{{ cat.id }}" {% if request.GET.cat|add:"0" == cat.id %}selected{% endif %}>
                                     {{ cat.name }}
@@ -33,9 +33,9 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Застосувати</button>
+                        <button type="submit" class="btn btn-primary">{% translate "Застосувати" %}</button>
                         {% if request.GET.q or request.GET.cat %}
-                            <a href="{% url 'books_list' %}" class="btn btn-outline-danger btn-sm text-center">Скасувати фільтри</a>
+                            <a href="{% url 'books_list' %}" class="btn btn-outline-danger btn-sm text-center">{% translate "Скасувати фільтри" %}</a>
                         {% endif %}
                     </div>
                 </form>
@@ -44,7 +44,7 @@
     </div>
 
     <div class="col-md-9">
-        <h2 class="mb-4">Наші книги</h2>
+        <h2 class="mb-4">{% translate "Наші книги" %}</h2>
         
         <div class="row row-cols-1 row-cols-md-2 g-4">
             {% for book in books %}
@@ -52,7 +52,7 @@
                     <div class="card h-100 shadow-sm border-0">
                         <div class="card-body">
                             <h5 class="card-title fw-bold">{{ book.title }}</h5>
-                            <h6 class="card-subtitle mb-3 text-muted">Автор: {{ book.author }}</h6>
+                            <h6 class="card-subtitle mb-3 text-muted">{% blocktranslate with author=book.author %}Автор: {{ author }}{% endblocktranslate %}</h6>
                             <p class="card-text text-secondary text-truncate" style="max-height: 50px;">{{ book.description }}</p>
                             
                             <div class="mb-3">
@@ -62,13 +62,17 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mt-3">
-                                <span class="badge bg-primary fs-6 py-2 px-3">{{ book.price }} грн</span>
-                                <span class="text-muted small">В наявності: {{ book.stock }} шт.</span>
+                                <span class="badge bg-primary fs-6 py-2 px-3">
+                                    {% blocktranslate with price=book.price %}{{ price }} грн{% endblocktranslate %}
+                                </span>
+                                <span class="text-muted small">
+                                    {% blocktranslate with stock=book.stock %}В наявності: {{ stock }} шт.{% endblocktranslate %}
+                                </span>
                             </div>
                         </div>
                         
                         <div class="card-footer bg-transparent border-top-0 d-flex gap-2 pb-3 align-items-center">
-                            <a href="{% url 'book_detail' book.id %}" class="btn btn-outline-info btn-sm">Детальніше</a>
+                            <a href="{% url 'book_detail' book.id %}" class="btn btn-outline-info btn-sm">{% translate "Детальніше" %}</a>
                             
                             <div class="flex-grow-1 d-flex justify-content-center">
                                 {% with book_id_str=book.id|slugify %}
@@ -80,7 +84,9 @@
                                             
                                             <span class="fw-bold text-dark small">
                                                 {% for key, value in cart.items %}
-                                                    {% if key == book_id_str %}{{ value }} шт.{% endif %}
+                                                    {% if key == book_id_str %}
+                                                        {% blocktranslate with count=value %}{{ count }} шт.{% endblocktranslate %}
+                                                    {% endif %}
                                                 {% endfor %}
                                             </span>
                                             
@@ -90,40 +96,40 @@
                                     {% else %}
                                         <button class="btn btn-primary btn-sm w-100 fw-bold" 
                                                 onclick="cartAction('{% url 'add_to_cart' book.id %}', '{{ book.id }}', 'add_from_catalog')">
-                                            🛒 Купити
+                                            🛒 {% translate "Купити" %}
                                         </button>
                                     {% endif %}
 
                                 {% endwith %}
                             </div>
-                            {% if perms.books.update_book%}
-                            <a href="{% url 'book_update' book.id %}" class="btn btn-outline-warning btn-sm">✏️</a>
-                            {%endif%}
-                            {% if perms.books.delete_book%}
-                            <a href="{% url 'book_delete' book.id %}" class="btn btn-outline-danger btn-sm">🗑️</a>
-                            {%endif%}
+                            {% if perms.books.update_book %}
+                                <a href="{% url 'book_update' book.id %}" class="btn btn-outline-warning btn-sm" title="{% translate 'Редагувати' %}">✏️</a>
+                            {% endif %}
+                            {% if perms.books.delete_book %}
+                                <a href="{% url 'book_delete' book.id %}" class="btn btn-outline-danger btn-sm" title="{% translate 'Видалити' %}">🗑️</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             {% empty %}
                 <div class="col-12">
                     <div class="alert alert-warning text-center shadow-sm" role="alert">
-                        Книги не знайдено за вашим запитом.
+                        {% translate "Книги не знайдено за вашим запитом." %}
                     </div>
                 </div>
             {% endfor %}
         </div>
 
         {% if is_paginated %}
-            <nav class="mt-5" aria-label="Навігація сторінками">
+            <nav class="mt-5" aria-label="{% translate 'Навігація сторінками' %}">
                 <ul class="pagination justify-content-center">
                     
                     {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.cat %}&cat={{ request.GET.cat }}{% endif %}">Назад</a>
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.cat %}&cat={{ request.GET.cat }}{% endif %}">{% translate "Назад" %}</a>
                         </li>
                     {% else %}
-                        <li class="page-item disabled"><span class="page-link">Назад</span></li>
+                        <li class="page-item disabled"><span class="page-link">{% translate "Назад" %}</span></li>
                     {% endif %}
 
                     {% for num in page_obj.paginator.page_range %}
@@ -138,10 +144,10 @@
 
                     {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.cat %}&cat={{ request.GET.cat }}{% endif %}">Вперед</a>
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.cat %}&cat={{ request.GET.cat }}{% endif %}">{% translate "Вперед" %}</a>
                         </li>
                     {% else %}
-                        <li class="page-item disabled"><span class="page-link">Вперед</span></li>
+                        <li class="page-item disabled"><span class="page-link">{% translate "Вперед" %}</span></li>
                     {% endif %}
                     
                 </ul>

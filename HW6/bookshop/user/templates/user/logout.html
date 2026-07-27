@@ -1,3 +1,4 @@
+{% load i18n %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="{% url 'books_list' %}">BookShop</a>
@@ -6,19 +7,22 @@
             {% if request.user.is_authenticated %}
                 
                 <span class="navbar-text text-white me-3">
-                    Привет, <strong>{{ request.user.username }}</strong> 
-                    {% if request.user.phone %}({{ request.user.phone }}){% endif %}
+                    {% if request.user.phone %}
+                        {% blocktranslate with username=request.user.username phone=request.user.phone %}Привіт, <strong>{{ username }}</strong> ({{ phone }}){% endblocktranslate %}
+                    {% else %}
+                        {% blocktranslate with username=request.user.username %}Привіт, <strong>{{ username }}</strong>{% endblocktranslate %}
+                    {% endif %}
                 </span>
                 
               
                 <form action="{% url 'logout' %}" method="post" class="d-inline m-0 p-0">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger btn-sm">Выйти</button>
+                    <button type="submit" class="btn btn-outline-danger btn-sm">{% translate "Вийти" %}</button>
                 </form>
             {% else %}
                 
-                <a class="nav-link btn btn-outline-light btn-sm text-dark me-2" href="{% url 'login' %}">Войти</a>
-                <a class="nav-link btn btn-primary btn-sm text-white" href="{% url 'register' %}">Регистрация</a>
+                <a class="nav-link btn btn-outline-light btn-sm text-dark me-2" href="{% url 'login' %}">{% translate "Увійти" %}</a>
+                <a class="nav-link btn btn-primary btn-sm text-white" href="{% url 'register' %}">{% translate "Реєстрація" %}</a>
             {% endif %}
         </div>
     </div>

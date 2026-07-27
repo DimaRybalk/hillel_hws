@@ -51,7 +51,6 @@ class CustomLoginView(LoginView):
 class CustomLogoutView(LogoutView):
     success_url = reverse_lazy('login')
 
-
     def post(self, request, *args, **kwargs):
         user = request.user
         if user.is_authenticated:

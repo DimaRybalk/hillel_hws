@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% translate "Реєстрація" %}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -6,7 +8,7 @@
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0 text-center">Регистрация</h3>
+                    <h3 class="card-title mb-0 text-center">{% translate "Реєстрація" %}</h3>
                 </div>
                 <div class="card-body">
                     <form method="post" novalidate>
@@ -29,20 +31,20 @@
                         {% endfor %}
                         
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary">Создать аккаунт</button>
+                            <button type="submit" class="btn btn-primary">{% translate "Створити аккаунт" %}</button>
                         </div>
                     </form>
                 </div>
                 <div class="card-footer text-center text-muted">
-                    Уже есть аккаунт? <a href="{% url 'login' %}" class="text-decoration-none">Войти</a>
-                </div>
+    {% url 'login' as login_url %}
+    {% blocktranslate with url=login_url %}Вже маєте аккаунт? <a href="{{ url }}" class="text-decoration-none">Увійти</a>{% endblocktranslate %}
+</div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    
     document.querySelectorAll('input, select, textarea').forEach(function(el) {
         if (el.type !== 'checkbox' && el.type !== 'radio') {
             el.classList.add('form-control');

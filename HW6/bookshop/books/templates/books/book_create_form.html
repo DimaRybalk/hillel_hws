@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-
-{% block title %}Зберегти книгу - BookStore{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Зберегти книгу - BookStore" %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Форма книги</h4>
+                <h4 class="mb-0">{% translate "Форма книги" %}</h4>
             </div>
             <div class="card-body p-4">
                 <form method="post">
@@ -19,8 +19,8 @@
                     </div>
                     
                     <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-success px-4">Зберегти книгу</button>
-                        <a href="{% url 'books_list' %}" class="btn btn-outline-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-success px-4">{% translate "Зберегти книгу" %}</button>
+                        <a href="{% url 'books_list' %}" class="btn btn-outline-secondary">{% translate "Скасувати" %}</a>
                     </div>
                 </form>
             </div>

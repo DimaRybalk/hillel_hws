@@ -26,4 +26,4 @@ class OneOrderView(LoginRequiredMixin,DetailView):
     context_object_name = 'order'        
 
     def get_queryset(self):
-        return Order.objects.prefetch_related('items__book').all()
+        return Order.objects.filter(user=self.request.user).prefetch_related('items__book')

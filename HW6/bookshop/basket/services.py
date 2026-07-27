@@ -26,7 +26,11 @@ class SessionCart:
         target_quantity = current_quantity + int(quantity)
         
         if target_quantity > book.stock:
-            self.cart[book_id] = book.stock
+            if book.stock > 0:
+                self.cart[book_id] = book.stock
+            else:
+                self.cart.pop(book_id, None)
+
             self.save()
             return False 
         
@@ -40,14 +44,14 @@ class SessionCart:
             self.cart[book_id] -= 1
 
             if self.cart[book_id] <= 0:
-                self.cart.pop(book_id)
+                self.cart.pop(book_id, None)
                 
             self.save()
 
     def remove_from_cart(self,book_id):
         book_id = str(book_id)
         if book_id in self.cart:
-            self.cart.pop(book_id)
+            self.cart.pop(book_id, None)
             self.save()
 
     def save(self):
@@ -80,3 +84,7 @@ class SessionCart:
             'cart_items': cart_items,
             'cart_price': total_price,
         }
+    
+    @property
+    def total_quantity(self):
+        return sum(quantity for quantity in self.cart.values() if quantity > 0)

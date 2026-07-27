@@ -15,18 +15,27 @@ import logging
 logger = logging.getLogger('order_logger')
 
 class AddToCartView(View):
-    def post(self,request,book_id):
+    def post(self, request, book_id):
         cart = SessionCart(request)
-        success = cart.add_to_cart(book_id,quantity=1)
+        
+        try:
+            quantity = int(request.POST.get('quantity', 1))
+            if quantity <= 0:
+                quantity = 1
+        except (ValueError, TypeError):
+            quantity = 1
+        success = cart.add_to_cart(book_id, quantity=quantity)
+
         if not success:
             return JsonResponse({
-                'status': 'success', 
+                'status': 'error', 
                 'message': 'Вибачте, більше цієї книги немає на складі!'
             })
             
         return JsonResponse({
             'status': 'success',
-            'message': 'Книгу додано до кошика!'
+            'message': 'Книгу додано до кошика!',   
+            'cart_count': cart.total_quantity
         })
     
 class DeleteBookFromCartView(View):
@@ -45,6 +54,7 @@ class GetCartData(View):
     def get(self,request):
         cart = SessionCart(request)
         cart_data = cart.get_cart_data()
+        cart_data['cart_count'] = cart.total_quantity
         return render(request, 'basket/basket_detail.html', context=cart_data)
 
 class SubmitCartView(LoginRequiredMixin,View):
@@ -54,15 +64,24 @@ class SubmitCartView(LoginRequiredMixin,View):
         cart = SessionCart(request)
         cart_data = cart.get_cart_data()
 
+        if not cart_data['cart_items']:
+            messages.error(request, "Ваш кошик порожній! Додайте книги перед оформленням замовлення.")
+            return redirect('cart_detail')
+
         for item in cart_data['cart_items']:
             book = item['book']
+
+            if item['quantity'] <= 0:
+                messages.error(request, f"Некоректна кількість для книги '{book.title}'.")
+                return redirect('cart_detail')
+
             if book.stock < item['quantity']:
                 messages.error(
                     request, 
                     f"Вибачте, книги '{book.title}' недостатньо на складі. "
                     f"Доступно всього: {book.stock} шт."
                 )
-                return redirect('basket_detail')
+                return redirect('cart_detail')
             
         order = Order.objects.create(
             user=request.user,

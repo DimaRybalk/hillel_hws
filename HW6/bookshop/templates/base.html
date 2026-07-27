@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="uk">
+{% load i18n %}
+<html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Книжковий Магазин{% endblock %}</title>
+    <title>{% block title %}{% translate "Книжковий Магазин" %}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html, body {
@@ -38,46 +39,65 @@
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'books_list' %}active fw-bold{% endif %}" 
-                               href="{% url 'books_list' %}">Книги</a>
+                               href="{% url 'books_list' %}">{% translate "Книги" %}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'categories_list' %}active fw-bold{% endif %}" 
-                               href="{% url 'categories_list' %}">Категорії</a>
+                               href="{% url 'categories_list' %}">{% translate "Категорії" %}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'orders_list' %}active fw-bold{% endif %}" 
-                               href="{% url 'orders_list' %}">Замовлення</a>
+                               href="{% url 'orders_list' %}">{% translate "Замовлення" %}</a>
                         </li>
                     </ul>
                     
                     <div class="d-flex align-items-center gap-3">
-                        <a href="{% url 'cart_detail' %}" class="btn btn-outline-light btn-sm position-relative">
-                            🛒 Кошик
-                            <span id="header-cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ request.session.cart|length|default:0 }}
-                            </span>
-                        </a>
+                  <a href="{% url 'cart_detail' %}" class="btn btn-outline-light btn-sm position-relative">
+    🛒 {% translate "Кошик" %}
+    {% if request.session.cart and request.session.cart|length > 0 %}
+        <span id="header-cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ request.session.cart|length }}
+        </span>
+    {% endif %}
+</a>
                         
-                        {% if perms.books.add_book %}
-                        <a href="{% url 'book_create' %}" class="btn btn-success btn-sm">Додати книгу</a>
-                        {%endif%}
-                        {% if perms.categories.add_category %}
-                        <a href="{% url 'category_add' %}" class="btn btn-outline-light btn-sm">Додати категорію</a>
-                        {%endif%}
+                        {% if can_add_book %}
+                        <a href="{% url 'book_create' %}" class="btn btn-success btn-sm">{% translate "Додати книгу" %}</a>
+                        {% endif %}
+                        {% if can_add %}
+                        <a href="{% url 'category_add' %}" class="btn btn-outline-light btn-sm">{% translate "Додати категорію" %}</a>
+                        {% endif %}
 
-                        <div class="d-flex align-items-center border-start ps-3 border-secondary ms-2">
+                        <div class="border-start ps-3 border-secondary ms-2">
+                            <form action="{% url 'set_language' %}" method="post" class="m-0 p-0">
+        {% csrf_token %}
+        
+        {% if request.resolver_match %}
+            <input name="next" type="hidden" value="{{ request.path }}">
+        {% else %}
+            <input name="next" type="hidden" value="/">
+        {% endif %}
+
+        <select name="language" onchange="this.form.submit()" class="form-select form-select-sm bg-dark text-white border-secondary fw-bold" style="cursor: pointer; font-size: 0.85rem;">
+            <option value="uk" {% if LANGUAGE_CODE == 'uk' %}selected{% endif %}>UA</option>
+            <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>EN</option>
+        </select>
+    </form>
+                        </div>
+
+                        <div class="d-flex align-items-center border-start ps-3 border-secondary">
                             {% if request.user.is_authenticated %}
                                 <span class="navbar-text text-white small me-3">
-                                    Привіт, <strong class="text-info">{{ request.user.username }}</strong>
+                                    {% blocktranslate with username=request.user.username %}Привіт, <strong class="text-info">{{ username }}</strong>{% endblocktranslate %}
                                     {% if request.user.phone %}<span class="text-muted text-xs d-block" style="font-size: 0.75rem;">{{ request.user.phone }}</span>{% endif %}
                                 </span>
                                 <form action="{% url 'logout' %}" method="post" class="m-0 p-0">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Вийти</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">{% translate "Вийти" %}</button>
                                 </form>
                             {% else %}
-                                <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light me-2">Увійти</a>
-                                <a href="{% url 'register' %}" class="btn btn-sm btn-primary">Реєстрація</a>
+                                <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light me-2">{% translate "Увійти" %}</a>
+                                <a href="{% url 'register' %}" class="btn btn-sm btn-primary">{% translate "Реєстрація" %}</a>
                             {% endif %}
                         </div>
                     </div>
@@ -96,7 +116,7 @@
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                     <span class="text-white fw-bold fs-5">📚 BookStore</span>
-                    <p class="mb-0 small mt-1">&copy; 2026 Усі права захищені. Навчальний проєкт Django.</p>
+                    <p class="mb-0 small mt-1">&copy; 2026 {% translate "Усі права захищені. Навчальний проєкт Django." %}</p>
                 </div>
             </div>
         </div>
@@ -117,12 +137,12 @@
         .then(data => {
             if (data.status === 'success') {
                 if (actionType === 'add_from_catalog') {
-                    alert(data.message || 'Книгу додано!');
+                    alert(data.message || '{% translate "Книгу додано!" %}');
                 }
                 window.location.reload(); 
             }
         })
-        .catch(error => console.error('Помилка:', error));
+        .catch(error => console.error('{% translate "Помилка:" %}', error));
     }
     </script>
 </body>

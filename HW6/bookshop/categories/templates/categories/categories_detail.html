@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-
-{% block title %}Категорія: {{ category.name }}{% endblock %}
+{% load i18n %}
+{% block title %}{% blocktranslate with name=category.name %}Категорія: {{ name }}{% endblocktranslate %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -8,27 +8,29 @@
         <div class="card shadow-sm mb-4">
           
             <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">📁 Категорія: {{ category.name }}</h4>
-                <a href="{% url 'categories_list' %}" class="btn btn-outline-light btn-sm">Назад до списку</a>
+                <h4 class="mb-0">📁 {% blocktranslate with name=category.name %}Категорія: {{ name }}{% endblocktranslate %}</h4>
+                <a href="{% url 'categories_list' %}" class="btn btn-outline-light btn-sm">{% translate "Назад до списку" %}</a>
             </div>
             
             
             <div class="card-body p-4">
-                <h5 class="mb-3 text-secondary">Книги в цій категорії:</h5>
+                <h5 class="mb-3 text-secondary">{% translate "Книги в цій категорії:" %}</h5>
                 
                 <div class="list-group">
                   
-                    {% for book in category.books.all %}
+                    {% for book in books %}
                         <a href="{% url 'book_detail' book.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             <div>
                                 <strong class="fs-5">{{ book.title }}</strong>
-                                <span class="text-muted d-block small">Автор: {{ book.author }}</span>
+                                <span class="text-muted d-block small">{% blocktranslate with author=book.author %}Автор: {{ author }}{% endblocktranslate %}</span>
                             </div>
-                            <span class="badge bg-primary rounded-pill">{{ book.price }} грн</span>
+                            <span class="badge bg-primary rounded-pill">
+                                {% blocktranslate with price=book.price %}{{ price }} грн{% endblocktranslate %}
+                            </span>
                         </a>
                     {% empty %}
                         <div class="alert alert-light text-center py-4 border mb-0" role="alert">
-                            У цій категорії поки немає жодної книги.
+                            {% translate "У цій категорії поки немає жодної книги." %}
                         </div>
                     {% endfor %}
                 </div>
@@ -37,12 +39,12 @@
         
             <div class="card-footer bg-light d-flex gap-2 justify-content-end p-3">
                 
-                {% if perms.categories.update_category%}
-                <a href="{% url 'category_edit' category.id %}" class="btn btn-warning">✏️ Редагувати назву</a>
-                {%endif%}
-                {% if perms.categories.delete_category%}
-                <a href="{% url 'category_delete' category.id %}" class="btn btn-danger">🗑️ Видалити категорію</a>
-                {%endif%}
+                {% if perms.categories.update_category %}
+                <a href="{% url 'category_edit' category.id %}" class="btn btn-warning">✏️ {% translate "Редагувати назву" %}</a>
+                {% endif %}
+                {% if perms.categories.delete_category %}
+                <a href="{% url 'category_delete' category.id %}" class="btn btn-danger">🗑️ {% translate "Видалити категорію" %}</a>
+                {% endif %}
             </div>
         </div>
     </div>

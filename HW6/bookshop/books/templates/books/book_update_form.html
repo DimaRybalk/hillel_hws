@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-
-{% block title %}Редагувати книгу "{{ book.title }}"{% endblock %}
+{% load i18n %}
+{% block title %}{% blocktranslate with title=book.title %}Редагувати книгу "{{ title }}"{% endblocktranslate %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm border-warning">
             <div class="card-header bg-warning text-dark">
-                <h4 class="mb-0">✏️ Редагування книги: "{{ book.title }}"</h4>
+                <h4 class="mb-0">✏️ {% blocktranslate with title=book.title %}Редагування книги: "{{ title }}"{% endblocktranslate %}</h4>
             </div>
             <div class="card-body p-4">
                 <form method="post">
@@ -18,8 +18,8 @@
                     </div>
                     
                     <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-warning px-4">Зберегти зміни</button>
-                        <a href="{% url 'books_list' %}" class="btn btn-outline-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-warning px-4">{% translate "Зберегти зміни" %}</button>
+                        <a href="{% url 'books_list' %}" class="btn btn-outline-secondary">{% translate "Скасувати" %}</a>
                     </div>
                 </form>
             </div>

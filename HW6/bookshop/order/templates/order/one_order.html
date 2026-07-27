@@ -1,33 +1,33 @@
 {% extends 'base.html' %}
-
-{% block title %}Замовлення №{{ order.id }}{% endblock %}
+{% load i18n %}
+{% block title %}{% blocktranslate with id=order.id %}Замовлення №{{ id }}{% endblocktranslate %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-                <h4 class="mb-0">Замовлення №{{ order.id }}</h4>
-                <span class="text-muted small">Від {{ order.created_at|date:"d.m.Y H:i" }}</span>
+                <h4 class="mb-0">{% blocktranslate with id=order.id %}Замовлення №{{ id }}{% endblocktranslate %}</h4>
+                <span class="text-muted small">{% blocktranslate with date=order.created_at|date:"d.m.Y H:i" %}Від {{ date }}{% endblocktranslate %}</span>
             </div>
             
             <div class="card-body p-4">
                 <div class="mb-4">
-                    <h5 class="text-secondary small text-uppercase fw-bold">Поточний статус:</h5>
+                    <h5 class="text-secondary small text-uppercase fw-bold">{% translate "Поточний статус:" %}</h5>
                     {% if order.status == 'new' %}
-                        <span class="badge bg-primary fs-6 px-3 py-2">Нове (Очікує обробки)</span>
+                        <span class="badge bg-primary fs-6 px-3 py-2">{% translate "Нове (Очікує обробки)" %}</span>
                     {% elif order.status == 'paid' %}
-                        <span class="badge bg-success fs-6 px-3 py-2">Оплачено</span>
+                        <span class="badge bg-success fs-6 px-3 py-2">{% translate "Оплачено" %}</span>
                     {% elif order.status == 'sent' %}
-                        <span class="badge bg-info text-dark fs-6 px-3 py-2">Відправлено</span>
+                        <span class="badge bg-info text-dark fs-6 px-3 py-2">{% translate "Відправлено" %}</span>
                     {% else %}
-                        <span class="badge bg-secondary fs-6 px-3 py-2">Скасовано</span>
+                        <span class="badge bg-secondary fs-6 px-3 py-2">{% translate "Скасовано" %}</span>
                     {% endif %}
                 </div>
 
                 <hr>
 
-                <h5 class="text-secondary small text-uppercase fw-bold mb-3">Товари в замовленні:</h5>
+                <h5 class="text-secondary small text-uppercase fw-bold mb-3">{% translate "Товари в замовленні:" %}</h5>
                 <div class="list-group mb-4">
                     {% for item in order.items.all %}
                         <div class="list-group-item d-flex justify-content-between align-items-center py-3">
@@ -36,29 +36,29 @@
                                     {% if item.book %}
                                         {{ item.book.title }}
                                     {% else %}
-                                        <span class="text-muted italic">Товар видалено з каталогу</span>
+                                        <span class="text-muted italic">{% translate "Товар видалено з каталогу" %}</span>
                                     {% endif %}
                                 </h6>
-                                <small class="text-muted">Ціна на момент покупки: {{ item.price }} грн</small>
+                                <small class="text-muted">{% blocktranslate with price=item.price %}Ціна на момент покупки: {{ price }} грн{% endblocktranslate %}</small>
                             </div>
                             <div class="text-end">
-                                <span class="badge bg-light text-dark border me-3">{{ item.quantity }} шт.</span>
-                                <span class="fw-bold">{{ item.price }} грн</span>
+                                <span class="badge bg-light text-dark border me-3">{% blocktranslate with qty=item.quantity %}{{ qty }} шт.{% endblocktranslate %}</span>
+                                <span class="fw-bold">{% blocktranslate with price=item.price %}{{ price }} грн{% endblocktranslate %}</span>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded border">
-                    <span class="fs-5 fw-bold">Загальна вартість:</span>
-                    <span class="fs-4 fw-bold text-primary">{{ order.total_price }} грн</span>
+                    <span class="fs-5 fw-bold">{% translate "Загальна вартість:" %}</span>
+                    <span class="fs-4 fw-bold text-primary">{% blocktranslate with total=order.total_price %}{{ total }} грн{% endblocktranslate %}</span>
                 </div>
             </div>
 
             <div class="card-footer bg-white border-top-0 p-3 d-flex justify-content-between align-items-center">
                 <div>
-                    <a href="{% url 'orders_list' %}" class="btn btn-outline-secondary me-2">Повернутися до історії</a>
-                    <button class="btn btn-outline-primary" onclick="window.print()">🖨️ Друкувати чек</button>
+                    <a href="{% url 'orders_list' %}" class="btn btn-outline-secondary me-2">{% translate "Повернутися до історії" %}</a>
+                    <button class="btn btn-outline-primary" onclick="window.print()">🖨️ {% translate "Друкувати чек" %}</button>
                 </div>
 
                 {% if order.status == 'new' %}
@@ -67,7 +67,7 @@
                         <input type="hidden" name="order_id" value="{{ order.id }}">
                         
                         <button type="submit" class="btn btn-success fw-bold px-4 py-2">
-                            💳 Оплатити карткою
+                            💳 {% translate "Оплатити карткою" %}
                         </button>
                     </form>
                 {% endif %}

@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-
-{% block title %}Категорії - BookStore{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Категорії - BookStore" %}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Управління категоріями</h2>
+    <h2>{% translate "Управління категоріями" %}</h2>
     {% if perms.categories.add_category %}
-    <a href="{% url 'category_add' %}" class="btn btn-primary">+ Додати категорію</a>
-    {%endif%}
+    <a href="{% url 'category_add' %}" class="btn btn-primary">+ {% translate "Додати категорію" %}</a>
+    {% endif %}
 </div>
 
 <div class="card shadow-sm">
@@ -16,10 +16,10 @@
             <thead class="table-dark">
                 <tr>
                     <th scope="col" class="ps-4">#</th>
-                    <th scope="col">Назва категорії</th>
-                    {% if perms.categories.update_category%}
-                    <th scope="col" class="text-end pe-4">Дії</th>
-                    {%endif%}
+                    <th scope="col">{% translate "Назва категорії" %}</th>
+                    {% if perms.categories.update_category or perms.categories.delete_category %}
+                    <th scope="col" class="text-end pe-4">{% translate "Дії" %}</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -32,16 +32,20 @@
                                 {{ category.name }}
                             </a>
                         </td>
-                        {% if perms.categories.update_category %}
+                        {% if perms.categories.update_category or perms.categories.delete_category %}
                         <td class="text-end pe-4">
-                            <a href="{% url 'category_edit' category.id %}" class="btn btn-sm btn-outline-warning me-1">✏️ Редагувати</a>
-                            <a href="{% url 'category_delete' category.id %}" class="btn btn-sm btn-outline-danger">🗑️ Видалити</a>
+                            {% if perms.categories.update_category %}
+                                <a href="{% url 'category_edit' category.id %}" class="btn btn-sm btn-outline-warning me-1">✏️ {% translate "Редагувати" %}</a>
+                            {% endif %}
+                            {% if perms.categories.delete_category %}
+                                <a href="{% url 'category_delete' category.id %}" class="btn btn-sm btn-outline-danger">🗑️ {% translate "Видалити" %}</a>
+                            {% endif %}
                         </td>
-                        {%endif%}
+                        {% endif %}
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="3" class="text-center py-4 text-muted">Категорій поки немає.</td>
+                        <td colspan="3" class="text-center py-4 text-muted">{% translate "Категорій поки немає." %}</td>
                     </tr>
                 {% endfor %}
             </tbody>

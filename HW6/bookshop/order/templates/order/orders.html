@@ -1,48 +1,52 @@
 {% extends 'base.html' %}
-
-{% block title %}Мої замовлення{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Мої замовлення" %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-10">
-        <h2 class="mb-4">📋 Історія замовлень</h2>
+        <h2 class="mb-4">📋 {% translate "Історія замовлень" %}</h2>
         
         <div class="card shadow-sm border-0">
             <div class="card-body p-0">
                 <table class="table table-hover table-striped mb-0 align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th scope="col" class="ps-4">Номер</th>
-                            <th scope="col">Дата оформлення</th>
-                            <th scope="col">Статус</th>
-                            <th scope="col">Загальна сума</th>
-                            <th scope="col" class="text-end pe-4">Дії</th>
+                            <th scope="col" class="ps-4">{% translate "Номер" %}</th>
+                            <th scope="col">{% translate "Дата оформлення" %}</th>
+                            <th scope="col">{% translate "Статус" %}</th>
+                            <th scope="col">{% translate "Загальна сума" %}</th>
+                            <th scope="col" class="text-end pe-4">{% translate "Дії" %}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for order in orders %}
                             <tr>
-                                <th scope="row" class="ps-4">№ {{ order.id }}</th>
+                                <th scope="row" class="ps-4">
+                                    {% blocktranslate with id=order.id %}№ {{ id }}{% endblocktranslate %}
+                                </th>
                                 <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
                                 <td>
                                     {% if order.status == 'new' %}
-                                        <span class="badge bg-primary">Нове</span>
+                                        <span class="badge bg-primary">{% translate "Нове" %}</span>
                                     {% elif order.status == 'paid' %}
-                                        <span class="badge bg-success">Оплачено</span>
+                                        <span class="badge bg-success">{% translate "Оплачено" %}</span>
                                     {% elif order.status == 'sent' %}
-                                        <span class="badge bg-info text-dark">Відправлено</span>
+                                        <span class="badge bg-info text-dark">{% translate "Відправлено" %}</span>
                                     {% else %}
-                                        <span class="badge bg-secondary">Скасовано</span>
+                                        <span class="badge bg-secondary">{% translate "Скасовано" %}</span>
                                     {% endif %}
                                 </td>
-                                <td class="fw-bold">{{ order.total_price }} грн</td>
+                                <td class="fw-bold">
+                                    {% blocktranslate with total=order.total_price %}{{ total }} грн{% endblocktranslate %}
+                                </td>
                                 <td class="text-end pe-4">
-                                    <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-dark">Переглянути</a>
+                                    <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-dark">{% translate "Переглянути" %}</a>
                                 </td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">Ви ще не робили замовлень.</td>
+                                <td colspan="5" class="text-center py-4 text-muted">{% translate "Ви ще не робили замовлень." %}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
