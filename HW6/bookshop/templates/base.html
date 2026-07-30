@@ -54,9 +54,9 @@
                     <div class="d-flex align-items-center gap-3">
                   <a href="{% url 'cart_detail' %}" class="btn btn-outline-light btn-sm position-relative">
     🛒 {% translate "Кошик" %}
-    {% if request.session.cart and request.session.cart|length > 0 %}
+    {% if cart_count > 0 %}
         <span id="header-cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{ request.session.cart|length }}
+            {{ cart_count }}
         </span>
     {% endif %}
 </a>

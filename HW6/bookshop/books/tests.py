@@ -2,7 +2,7 @@ from django.test import Client, TestCase, AsyncClient
 import pytest
 from django.urls import reverse
 from books.models import Book
-from books.views import BookForm
+from books.forms import BookForm
 from categories.models import Category
 from bookshop.factories import CategoryFactory,BookFactory,UserFactory
 from asgiref.sync import sync_to_async

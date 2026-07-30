@@ -6,7 +6,13 @@ from django.views.generic.detail import DetailView
 
 from .models import Order
 
-
+"""
+Views for the `order` app.
+ 
+Handles order history: a paginated list of the logged-in user's past
+orders, and a detail page for a single order. Both are strictly
+scoped to the requesting user's own orders.
+"""
 
 
 

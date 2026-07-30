@@ -18,6 +18,15 @@ from django.views.generic import TemplateView
 from stripe import StripeClient
 from django.core.mail import send_mail
 
+
+"""
+Views for the `payments` app.
+ 
+Handles the Stripe payment flow: creating Checkout Sessions, receiving
+webhook events, and the success/cancel pages that update order status
+and email a receipt once payment is confirmed.
+"""
+
 YOUR_DOMAIN = 'http://localhost:8000/'
 
 stripe_key =  os.environ.get('STRIPE_CLIENT_API')

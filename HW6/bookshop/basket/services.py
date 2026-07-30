@@ -11,8 +11,29 @@ class SessionCart:
 
         if not cart:
             cart = self.session['cart'] = {}
-        
+
         self.cart = cart
+        self._remove_deleted_books()
+
+    def _remove_deleted_books(self):
+        """
+        Drop cart entries for books that no longer exist in the database
+        (e.g. deleted by an admin) so counts/badges never reference
+        phantom items that were removed from the catalog.
+        """
+        if not self.cart:
+            return
+
+        existing_ids = set(
+            str(book_id) for book_id in
+            Book.objects.filter(id__in=self.cart.keys()).values_list('id', flat=True)
+        )
+        stale_ids = [book_id for book_id in self.cart if book_id not in existing_ids]
+
+        if stale_ids:
+            for book_id in stale_ids:
+                self.cart.pop(book_id, None)
+            self.save()
 
     def add_to_cart(self,book_id,quantity=1):
         book_id = str(book_id)
