@@ -12,6 +12,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('silk/', include('silk.urls', namespace='silk')),
     path('i18n/', include('django.conf.urls.i18n')),
+    path('api/', include('api.urls')),
 ]
 
 urlpatterns += i18n_patterns(
@@ -22,6 +23,7 @@ urlpatterns += i18n_patterns(
     path('basket/', include('basket.urls')),
     path('user/', include('user.urls')),
     path('payments/', include('payments.urls')),
+    
     
     prefix_default_language=True 
 )
