@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.contrib.auth.views import LoginView, LogoutView
 from .forms import CustomUserCreationForm
-
+from user.tasks import send_welcome_email_task
 
 """
 Views for the `user` app.
@@ -31,6 +31,9 @@ class RegisterView(CreateView):
             f"НОВИЙ КОРИСТУВАЧ: Зареєстровано новий акаунт через форму. "
             f"Username: {user.username}, Email: {user.email}, ID: {user.id}"
         )
+
+        send_welcome_email_task.delay(user.email, user.username)
+
         return response
 
 

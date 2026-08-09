@@ -15,6 +15,10 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from stripe import StripeClient
+from celery.schedules import crontab
+import os
+import sentry_sdk
+
 
 load_dotenv(override=False)
 
@@ -62,6 +66,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework_simplejwt',
     'corsheaders',
+    'django_celery_beat',
     
 ]
 
@@ -320,3 +325,39 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:5173",
 ]
+
+CACHES = {
+    "default": {
+        'BACKEND':'django_redis.cache.RedisCache',
+        # local'redis://127.0.0.1:6379/1'
+        # Docker Compose : 'redis://redis:6379/1'
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_BEAT_SCHEDULE = {
+    'clear-expired-sessions-every-day': {
+        'task': 'books.tasks.clear_expired_sessions_task',
+        'schedule': crontab(hour=3, minute=0), 
+    },
+    'generate-daily-report': {
+        'task': 'books.tasks.generate_books_report_task',
+        'schedule': crontab(hour=8, minute=0), 
+    },
+}
+
+sentry_sdk.init(
+    dsn="https://0ee857e56c3f1c444060ba45687504ee@o4511882038018048.ingest.de.sentry.io/4511882042605648",  
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)

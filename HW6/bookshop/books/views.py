@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.paginator import Paginator
 from asgiref.sync import sync_to_async
 from django.http import Http404
+from django.core.cache import cache
 
 """
 Views for the `books` app.
@@ -20,13 +21,28 @@ views for managing the catalog.
 
 
 async def books_view(request):
-    queryset = Book.objects.prefetch_related('category').all()
-
+    
+    category_id = request.GET.get('cat')
+    page_number = request.GET.get('page', 1)
     query = request.GET.get('q')
+
+    def get_user_data():
+            return {
+                'can_add_book': request.user.has_perm('books.add_book')
+            }
+    user_data = await sync_to_async(get_user_data)()
+
+    cache_key = f"books_view:q={query}:cat={category_id}:page={page_number}:can_add={user_data['can_add_book']}"  
+
+    cached_response = await cache.aget(cache_key)
+    if cached_response:
+        return cached_response    
+    
+    queryset = Book.objects.prefetch_related('category').all()  
     if query:
         queryset = queryset.filter(title__icontains=query)
 
-    category_id = request.GET.get('cat')
+    
     if category_id:
         if category_id.isdigit():
             queryset = queryset.filter(category__id=category_id)
@@ -42,14 +58,9 @@ async def books_view(request):
         all_categories.append(category)
 
     paginator = Paginator(book_list, 10)
-    page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    def get_user_data():
-        return {
-            'can_add_book': request.user.has_perm('books.add_book')
-        }
-    user_data = await sync_to_async(get_user_data)()
+    
 
     context = {
         'books': page_obj,
@@ -59,16 +70,24 @@ async def books_view(request):
         'can_add_book': user_data['can_add_book'],
     }
 
-    return await sync_to_async(render)(request, 'books/books.html', context)
-
+    response =  await sync_to_async(render)(request, 'books/books.html', context)
+    await cache.aset(cache_key, response, timeout=900)
+    return response
 
 async def one_book_view(request, pk):
-    queryset = Book.objects.prefetch_related('category')
+    cache_key = f"book_detail:{pk}"
 
-    try:
-        book = await queryset.aget(id=pk)
-    except Book.DoesNotExist:
-        raise Http404('Book does not exist')
+    book = await cache.aget(cache_key)
+
+    if not book:
+        try:
+            queryset = Book.objects.prefetch_related('category')
+            book = await queryset.aget(id=pk)
+            await cache.aset(cache_key,book,timeout=3600)        
+        except Book.DoesNotExist:
+            raise Http404('Book does not exist')
+
+    
 
     def get_user_data():
         return {
@@ -84,8 +103,8 @@ async def one_book_view(request, pk):
         'can_delete_book': user_data['can_delete_book'],
     }
 
-    return await sync_to_async(render)(request, 'books/book_detail.html', context)
-
+    response = await sync_to_async(render)(request, 'books/book_detail.html', context)
+    return response
 
 class CreateBookView(PermissionRequiredMixin, CreateView):
     model = Book
