@@ -26,7 +26,7 @@ YOUR_DOMAIN = "http://localhost:8000/"
 
 
 def get_stripe_client():
-   
+
     api_key = os.environ.get(
         "STRIPE_CLIENT_API",
         getattr(settings, "STRIPE_CLIENT_API", "sk_test_placeholder_key_for_tests"),
@@ -75,9 +75,7 @@ class CustomerPortalView(View):
     def post(self, request):
         client = get_stripe_client()
         checkout_session_id = request.GET.get("session_id")
-        checkout_session = client.v1.checkout.sessions.retrieve(
-            checkout_session_id
-        )
+        checkout_session = client.v1.checkout.sessions.retrieve(checkout_session_id)
 
         return_url = YOUR_DOMAIN
 
@@ -135,9 +133,7 @@ class PaymentSuccessView(TemplateView):
 
         customer_email = session.customer_details.email
         if customer_email:
-            subject = (
-                f"Електронний чек. Замовлення №{order.id} у магазині BookShop"
-            )
+            subject = f"Електронний чек. Замовлення №{order.id} у магазині BookShop"
             message = (
                 f"Вітаємо! Ваша оплата успішно прийнята.\n\n"
                 f"Деталі замовлення:\n"
