@@ -1,21 +1,18 @@
 import json
+import os
 
-from django.shortcuts import get_object_or_404
+from django.conf import settings
+from django.core.mail import send_mail
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
 import stripe
+from stripe import StripeClient
 
 from order.models import Order
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-
-# ! /usr/bin/env python3.6
-import os
-from django.conf import settings
-from django.shortcuts import redirect
-from django.http import HttpResponse, JsonResponse
-from django.views.generic import TemplateView
-from stripe import StripeClient
-from django.core.mail import send_mail
 
 """
 Views for the `payments` app.
@@ -27,14 +24,16 @@ and email a receipt once payment is confirmed.
 
 YOUR_DOMAIN = "http://localhost:8000/"
 
-
-def get_stripe_client():
-    return StripeClient(os.environ.get("STRIPE_CLIENT_API"))
+# Єдина глобальна ініціалізація Stripe-клієнта:
+# Спочатку шукає в env, якщо немає — бере з Django settings.
+stripe_api_key = os.environ.get(
+    "STRIPE_CLIENT_API", getattr(settings, "STRIPE_CLIENT_API", None)
+)
+client = StripeClient(stripe_api_key)
 
 
 class CheckoutSession(View):
     def post(self, request):
-        client = get_stripe_client()
         try:
             order_id = request.POST.get("order_id")
 
@@ -71,7 +70,6 @@ class CheckoutSession(View):
 
 class CustomerPortalView(View):
     def post(self, request):
-        client = get_stripe_client()
         checkout_session_id = request.GET.get("session_id")
         checkout_session = client.v1.checkout.sessions.retrieve(checkout_session_id)
 
@@ -89,14 +87,10 @@ class CustomerPortalView(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class WebhookReceivedView(View):
     def post(self, request):
-
-        webhook_secret = (
-            "whsec_29aa933babf668b6f8c8dbf6842e3c66d3844cd0c7ea9baea10dd886eb7cb23f"
-        )
+        webhook_secret = getattr(settings, "STRIPE_WEBHOOK_SECRET", None)
         request_data = json.loads(request.body)
 
         if webhook_secret:
-            # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
             signature = request.headers.get("stripe-signature")
             try:
                 event = stripe.Webhook.construct_event(
@@ -110,8 +104,8 @@ class WebhookReceivedView(View):
         else:
             data = request_data["data"]
             event_type = request_data["type"]
-        data_object = data["object"]  # noqa: F841
 
+        data_object = data["object"]  # noqa: F841
         print("event " + event_type)
 
         return JsonResponse({"status": "success"})
@@ -121,7 +115,6 @@ class PaymentSuccessView(TemplateView):
     template_name = "success.html"
 
     def get(self, request, *args, **kwargs):
-        client = get_stripe_client()
         session_id = request.GET.get("session_id")
 
         session = client.v1.checkout.sessions.retrieve(session_id)
