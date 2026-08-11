@@ -27,12 +27,15 @@ and email a receipt once payment is confirmed.
 
 YOUR_DOMAIN = "http://localhost:8000/"
 
-stripe_key = os.environ.get("STRIPE_CLIENT_API")
-client = StripeClient(stripe_key)
+def get_stripe_client():
+    return StripeClient(os.environ.get("STRIPE_CLIENT_API"))
+
+
 
 
 class CheckoutSession(View):
     def post(self, request):
+        client = get_stripe_client()
         try:
             order_id = request.POST.get("order_id")
 
