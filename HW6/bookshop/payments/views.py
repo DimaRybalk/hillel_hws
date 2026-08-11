@@ -24,19 +24,18 @@ and email a receipt once payment is confirmed.
 
 YOUR_DOMAIN = "http://localhost:8000/"
 
+# 1. Отримуємо ключ із env або settings. Якщо ключа немає — беремо тестовий заповнювач для Stripe SDK
+api_key = os.environ.get(
+    "STRIPE_CLIENT_API",
+    getattr(settings, "STRIPE_CLIENT_API", "sk_test_placeholder_key_for_tests"),
+)
 
-def get_stripe_client():
-
-    api_key = os.environ.get(
-        "STRIPE_CLIENT_API",
-        getattr(settings, "STRIPE_CLIENT_API", "sk_test_placeholder_key_for_tests"),
-    )
-    return StripeClient(api_key)
+# 2. Оголошуємо client прямо у модулі (це вирішує AttributeError у тестах з @patch("payments.views.client"))
+client = StripeClient(api_key)
 
 
 class CheckoutSession(View):
     def post(self, request):
-        client = get_stripe_client()
         try:
             order_id = request.POST.get("order_id")
 
@@ -73,7 +72,6 @@ class CheckoutSession(View):
 
 class CustomerPortalView(View):
     def post(self, request):
-        client = get_stripe_client()
         checkout_session_id = request.GET.get("session_id")
         checkout_session = client.v1.checkout.sessions.retrieve(checkout_session_id)
 
@@ -119,7 +117,6 @@ class PaymentSuccessView(TemplateView):
     template_name = "success.html"
 
     def get(self, request, *args, **kwargs):
-        client = get_stripe_client()
         session_id = request.GET.get("session_id")
 
         session = client.v1.checkout.sessions.retrieve(session_id)
