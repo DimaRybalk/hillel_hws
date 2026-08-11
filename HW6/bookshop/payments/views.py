@@ -27,10 +27,9 @@ and email a receipt once payment is confirmed.
 
 YOUR_DOMAIN = "http://localhost:8000/"
 
+
 def get_stripe_client():
     return StripeClient(os.environ.get("STRIPE_CLIENT_API"))
-
-
 
 
 class CheckoutSession(View):
