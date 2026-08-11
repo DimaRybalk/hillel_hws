@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-ci-test-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 
 # Application definition
@@ -349,3 +349,13 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
     profiles_sample_rate=1.0,
 )
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": os.environ.get("GOOGLE_CLIENT_ID", ""),
+            "secret": os.environ.get("GOOGLE_CLIENT_SECRET", ""),
+            "key": "",
+        }
+    }
+}
