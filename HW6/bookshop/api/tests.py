@@ -7,7 +7,6 @@ from bookshop.factories import (
     CategoryFactory,
     UserFactory,
     OrderFactory,
-    
 )
 from rest_framework.test import APIClient
 

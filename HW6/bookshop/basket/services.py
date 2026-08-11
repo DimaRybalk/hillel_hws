@@ -1,4 +1,3 @@
-
 from books.models import Book
 from decimal import Decimal
 
