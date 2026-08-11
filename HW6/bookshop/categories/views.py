@@ -10,7 +10,7 @@ from asgiref.sync import sync_to_async
 
 """
 Views for the `categories` app.
- 
+
 Handles browsing categories and the books assigned to them, plus
 permission-gated create/update/delete views for managing the category
 list. Deleting a category never deletes its books.

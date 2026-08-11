@@ -6,4 +6,4 @@ class BooksConfig(AppConfig):
     name = "books"
 
     def ready(self):
-        import books.signals
+        from . import signals  # noqa: F401

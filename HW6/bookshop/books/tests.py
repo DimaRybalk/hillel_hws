@@ -94,7 +94,7 @@ async def test_one_book_view():
 @pytest.mark.django_db
 def test_flow_book_search():
     book1 = BookFactory(title="Python Programming Guide")
-    book2 = BookFactory()
+    BookFactory()
 
     client = Client()
 

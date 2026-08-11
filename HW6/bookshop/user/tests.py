@@ -47,7 +47,7 @@ def test_user_login():
 @pytest.mark.django_db
 def test_user_login_with_invalid_data():
     raw_password = "qwerty12345"
-    new_user = UserFactory(password=raw_password)
+    UserFactory(password=raw_password)
 
     client = Client()
     login = client.login(password="123445")

@@ -7,7 +7,7 @@ from user.tasks import send_welcome_email_task
 
 """
 Views for the `user` app.
- 
+
 Handles account registration, login, and logout via Django's built-in
 auth views (Google OAuth is handled separately by django-allauth).
 Logs authentication events for auditing.

@@ -8,7 +8,7 @@ from order.models import Order
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
-#! /usr/bin/env python3.6
+# ! /usr/bin/env python3.6
 import os
 from django.conf import settings
 from django.shortcuts import redirect
@@ -19,7 +19,7 @@ from django.core.mail import send_mail
 
 """
 Views for the `payments` app.
- 
+
 Handles the Stripe payment flow: creating Checkout Sessions, receiving
 webhook events, and the success/cancel pages that update order status
 and email a receipt once payment is confirmed.
@@ -107,7 +107,7 @@ class WebhookReceivedView(View):
         else:
             data = request_data["data"]
             event_type = request_data["type"]
-        data_object = data["object"]
+        data_object = data["object"]  # noqa: F841
 
         print("event " + event_type)
 

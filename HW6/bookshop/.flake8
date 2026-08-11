@@ -5,6 +5,5 @@ exclude =
     __pycache__,
     migrations,
     venv,
-    .venv,
-    env
-ignore = E203, W503
+    .venv
+ignore = E203, W503, F403, F405

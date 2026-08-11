@@ -15,7 +15,6 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from celery.schedules import crontab
-import os
 import sentry_sdk
 
 load_dotenv(override=False)

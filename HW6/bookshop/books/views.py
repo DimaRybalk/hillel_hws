@@ -14,7 +14,7 @@ from django.db import connection
 
 """
 Views for the `books` app.
- 
+
 Handles the public book catalog: listing with search/filter/pagination,
 individual book detail pages, and permission-gated create/update/delete
 views for managing the catalog.
