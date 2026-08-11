@@ -33,6 +33,7 @@ services:
       - .env
     environment:
       - DB_HOST=host.docker.internal
+      - REDIS_HOST=redis
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

@@ -32,7 +32,6 @@ def health_check(request):
 
 
 async def books_view(request):
-
     category_id = request.GET.get("cat")
     page_number = request.GET.get("page", 1)
     query = request.GET.get("q")
@@ -42,29 +41,34 @@ async def books_view(request):
 
     user_data = await sync_to_async(get_user_data)()
 
-    cache_key = f"books_view:q={query}:cat={category_id}:page={page_number}:can_add={user_data['can_add_book']}"
+    data_cache_key = f"books_data:q={query}:cat={category_id}"
 
-    cached_response = await cache.aget(cache_key)
-    if cached_response:
-        return cached_response
+    cached_data = await cache.aget(data_cache_key)
 
-    queryset = Book.objects.prefetch_related("category").all()
-    if query:
-        queryset = queryset.filter(title__icontains=query)
+    if cached_data:
+        book_list = cached_data["book_list"]
+        all_categories = cached_data["all_categories"]
+    else:
+        queryset = Book.objects.prefetch_related("category").all()
+        if query:
+            queryset = queryset.filter(title__icontains=query)
 
-    if category_id:
-        if category_id.isdigit():
+        if category_id and category_id.isdigit():
             queryset = queryset.filter(category__id=category_id)
-        # Non-numeric / invalid 'cat' values are silently ignored
-        # rather than raising a 500 error.
 
-    book_list = []
-    async for book in queryset:
-        book_list.append(book)
+        book_list = []
+        async for book in queryset:
+            book_list.append(book)
 
-    all_categories = []
-    async for category in Category.objects.all():
-        all_categories.append(category)
+        all_categories = []
+        async for category in Category.objects.all():
+            all_categories.append(category)
+
+        await cache.aset(
+            data_cache_key,
+            {"book_list": book_list, "all_categories": all_categories},
+            timeout=60,
+        )
 
     paginator = Paginator(book_list, 10)
     page_obj = paginator.get_page(page_number)
@@ -77,9 +81,7 @@ async def books_view(request):
         "can_add_book": user_data["can_add_book"],
     }
 
-    response = await sync_to_async(render)(request, "books/books.html", context)
-    await cache.aset(cache_key, response, timeout=900)
-    return response
+    return await sync_to_async(render)(request, "books/books.html", context)
 
 
 async def one_book_view(request, pk):

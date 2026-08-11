@@ -72,6 +72,7 @@ class CheckoutSession(View):
 
 class CustomerPortalView(View):
     def post(self, request):
+        client = get_stripe_client()
         checkout_session_id = request.GET.get("session_id")
         checkout_session = client.v1.checkout.sessions.retrieve(checkout_session_id)
 
@@ -121,6 +122,7 @@ class PaymentSuccessView(TemplateView):
     template_name = "success.html"
 
     def get(self, request, *args, **kwargs):
+        client = get_stripe_client()
         session_id = request.GET.get("session_id")
 
         session = client.v1.checkout.sessions.retrieve(session_id)
