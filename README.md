@@ -4,6 +4,10 @@ A full-featured Django bookstore application: catalog browsing, categories, a se
 
 Educational project (Django 6.0.4).
 
+![Build Status](https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>/actions/workflows/django.yml/badge.svg)
+![Python Version](https://img.shields.io/badge/python-3.12-blue)
+![Django Version](https://img.shields.io/badge/django-6.0-green)
+
 ---
 
 ## Table of Contents
