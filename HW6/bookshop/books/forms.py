@@ -6,11 +6,11 @@ from .models import Book
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['title', 'author', 'price', 'description', 'stock', 'category']
+        fields = ["title", "author", "price", "description", "stock", "category"]
         widgets = {
-            'category': forms.CheckboxSelectMultiple(),
+            "category": forms.CheckboxSelectMultiple(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = Category.objects.all()
+        self.fields["category"].queryset = Category.objects.all()

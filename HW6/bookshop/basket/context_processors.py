@@ -10,8 +10,8 @@ def cart_count(request):
     very next page load, instead of only after a cart-related view
     happens to be visited.
     """
-    if not hasattr(request, 'session'):
-        return {'cart_count': 0}
+    if not hasattr(request, "session"):
+        return {"cart_count": 0}
 
     cart = SessionCart(request)
-    return {'cart_count': cart.total_quantity}
+    return {"cart_count": cart.total_quantity}

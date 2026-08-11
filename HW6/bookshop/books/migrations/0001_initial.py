@@ -8,25 +8,52 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('categories', '0001_initial'),
+        ("categories", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Book',
+            name="Book",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=100, verbose_name='book title')),
-                ('author', models.CharField(max_length=100, verbose_name='author name')),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='book price')),
-                ('description', models.TextField(blank=True, verbose_name='book description')),
-                ('stock', models.PositiveIntegerField(default=0, verbose_name='book stock')),
-                ('category', models.ManyToManyField(related_name='books', to='categories.category')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=100, verbose_name="book title")),
+                (
+                    "author",
+                    models.CharField(max_length=100, verbose_name="author name"),
+                ),
+                (
+                    "price",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=10, verbose_name="book price"
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="book description"),
+                ),
+                (
+                    "stock",
+                    models.PositiveIntegerField(default=0, verbose_name="book stock"),
+                ),
+                (
+                    "category",
+                    models.ManyToManyField(
+                        related_name="books", to="categories.category"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'book',
-                'verbose_name_plural': 'books',
-                'ordering': ['title'],
+                "verbose_name": "book",
+                "verbose_name_plural": "books",
+                "ordering": ["title"],
             },
         ),
     ]

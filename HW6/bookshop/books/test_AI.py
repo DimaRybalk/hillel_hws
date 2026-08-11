@@ -11,9 +11,9 @@ from bookshop.factories import BookFactory, CategoryFactory
 # translation entry exists for it.
 @pytest.mark.django_db
 def test_book_str_and_repr_return_title():
-    book = BookFactory(title='Кобзар')
-    assert str(book) == 'Кобзар'
-    assert repr(book) == 'Кобзар'
+    book = BookFactory(title="Кобзар")
+    assert str(book) == "Кобзар"
+    assert repr(book) == "Кобзар"
 
 
 # `price` is declared with validators=[MinValueValidator(Decimal('0.01'))].
@@ -21,7 +21,7 @@ def test_book_str_and_repr_return_title():
 # directly rather than relying on a form to catch it.
 @pytest.mark.django_db
 def test_book_price_below_minimum_fails_validation():
-    book = Book(title='Test Book', author='Test Author', price=Decimal('0.00'), stock=1)
+    book = Book(title="Test Book", author="Test Author", price=Decimal("0.00"), stock=1)
     with pytest.raises(ValidationError):
         book.full_clean()
 
@@ -30,7 +30,9 @@ def test_book_price_below_minimum_fails_validation():
 # case of the test above — confirms the validator isn't overly strict).
 @pytest.mark.django_db
 def test_book_valid_price_passes_validation():
-    book = Book(title='Test Book', author='Test Author', price=Decimal('19.99'), stock=1)
+    book = Book(
+        title="Test Book", author="Test Author", price=Decimal("19.99"), stock=1
+    )
     book.full_clean()  # should not raise
 
 
@@ -38,7 +40,9 @@ def test_book_valid_price_passes_validation():
 # not error out or default to None; it should be exactly 0 (out of stock).
 @pytest.mark.django_db
 def test_book_stock_defaults_to_zero():
-    book = Book.objects.create(title='No Stock Book', author='Someone', price=Decimal('10.00'))
+    book = Book.objects.create(
+        title="No Stock Book", author="Someone", price=Decimal("10.00")
+    )
     assert book.stock == 0
 
 
@@ -47,7 +51,7 @@ def test_book_stock_defaults_to_zero():
 # related_name declared on the field).
 @pytest.mark.django_db
 def test_book_category_relationship_is_bidirectional():
-    category = CategoryFactory(name='Фентезі')
+    category = CategoryFactory(name="Фентезі")
     book = BookFactory(category=[category])
     assert category in book.category.all()
     assert book in category.books.all()
@@ -73,9 +77,9 @@ def test_deleting_category_does_not_delete_associated_books():
 # alphabetically sorted, regardless of the order books were created in.
 @pytest.mark.django_db
 def test_books_are_ordered_by_title_by_default():
-    BookFactory(title='Зоряні війни')
-    BookFactory(title='Азбука')
-    BookFactory(title='Йосип')
+    BookFactory(title="Зоряні війни")
+    BookFactory(title="Азбука")
+    BookFactory(title="Йосип")
 
-    titles = list(Book.objects.values_list('title', flat=True))
+    titles = list(Book.objects.values_list("title", flat=True))
     assert titles == sorted(titles)

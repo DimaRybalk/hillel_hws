@@ -10,15 +10,15 @@
 
 #     def __str__(self):
 #         return f'корзина користувача {self.user.username}'
-    
+
 #     def get_basket_cost(self):
 #         return sum(item.get_cost() for item in self.items.all())
-    
+
 #     def create_order(self):
 #         basket_items = self.items.all()
 #         if not basket_items:
 #             return None
-        
+
 #         order = Order.objects.create(
 #             user = self.user,
 #             total_price = self.get_basket_cost()
@@ -34,7 +34,7 @@
 
 #             basket_item.book.stock -= basket_item.quantity
 #             basket_item.book.save()
-        
+
 #         basket_items.delete()
 
 #         return order
@@ -46,7 +46,6 @@
 
 #     def __str__(self):
 #         return f'{self.book.title} x {self.quantity} в кошику'
-    
+
 #     def get_cost(self):
 #         return self.book.price*self.quantity
-

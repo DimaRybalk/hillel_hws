@@ -2,10 +2,11 @@ import factory
 from django.contrib.auth import get_user_model
 from books.models import Book
 from categories.models import Category
-from order.models import Order,OrderItem
+from order.models import Order, OrderItem
 import random
 
 User = get_user_model()
+
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -15,18 +16,20 @@ class UserFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: f"user_{n}")
 
     @classmethod
-    def _crete(cls,model_class,*args,**kwargs):
-        password = kwargs.pop('password','qwerty123')
+    def _crete(cls, model_class, *args, **kwargs):
+        password = kwargs.pop("password", "qwerty123")
         user = super()._create(*args, **kwargs)
         user.set_password(password)
         user.save()
         return user
+
 
 class CategoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Category
 
     name = factory.Sequence(lambda n: f"test category{n}")
+
 
 class BookFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -49,13 +52,15 @@ class BookFactory(factory.django.DjangoModelFactory):
         else:
             self.category.add(CategoryFactory())
 
+
 class OrderFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Order
 
     user = factory.SubFactory(UserFactory)
-    status = 'new'
+    status = "new"
     total_price = 0.00
+
 
 class OrderItemFactory(factory.django.DjangoModelFactory):
     class Meta:

@@ -7,30 +7,65 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Order',
+            name="Order",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('total_price', models.DecimalField(blank=True, decimal_places=2, default=0.0, max_digits=10)),
-                ('status', models.CharField(choices=[('new', 'Нове'), ('paid', 'Оплачено'), ('sent', 'Відправлено'), ('cancelled', 'Скасовано')], default='new', max_length=20)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "total_price",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, default=0.0, max_digits=10
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("new", "Нове"),
+                            ("paid", "Оплачено"),
+                            ("sent", "Відправлено"),
+                            ("cancelled", "Скасовано"),
+                        ],
+                        default="new",
+                        max_length=20,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Замовлення',
-                'verbose_name_plural': 'Замовлення',
-                'ordering': ['-created_at'],
+                "verbose_name": "Замовлення",
+                "verbose_name_plural": "Замовлення",
+                "ordering": ["-created_at"],
             },
         ),
         migrations.CreateModel(
-            name='OrderItem',
+            name="OrderItem",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('price', models.DecimalField(blank=True, decimal_places=2, max_digits=10)),
-                ('quantity', models.PositiveIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "price",
+                    models.DecimalField(blank=True, decimal_places=2, max_digits=10),
+                ),
+                ("quantity", models.PositiveIntegerField()),
             ],
         ),
     ]
