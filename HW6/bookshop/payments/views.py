@@ -24,16 +24,19 @@ and email a receipt once payment is confirmed.
 
 YOUR_DOMAIN = "http://localhost:8000/"
 
-# Єдина глобальна ініціалізація Stripe-клієнта:
-# Спочатку шукає в env, якщо немає — бере з Django settings.
-stripe_api_key = os.environ.get(
-    "STRIPE_CLIENT_API", getattr(settings, "STRIPE_CLIENT_API", None)
-)
-client = StripeClient(stripe_api_key)
+
+def get_stripe_client():
+   
+    api_key = os.environ.get(
+        "STRIPE_CLIENT_API",
+        getattr(settings, "STRIPE_CLIENT_API", "sk_test_placeholder_key_for_tests"),
+    )
+    return StripeClient(api_key)
 
 
 class CheckoutSession(View):
     def post(self, request):
+        client = get_stripe_client()
         try:
             order_id = request.POST.get("order_id")
 
@@ -70,8 +73,11 @@ class CheckoutSession(View):
 
 class CustomerPortalView(View):
     def post(self, request):
+        client = get_stripe_client()
         checkout_session_id = request.GET.get("session_id")
-        checkout_session = client.v1.checkout.sessions.retrieve(checkout_session_id)
+        checkout_session = client.v1.checkout.sessions.retrieve(
+            checkout_session_id
+        )
 
         return_url = YOUR_DOMAIN
 
@@ -115,6 +121,7 @@ class PaymentSuccessView(TemplateView):
     template_name = "success.html"
 
     def get(self, request, *args, **kwargs):
+        client = get_stripe_client()
         session_id = request.GET.get("session_id")
 
         session = client.v1.checkout.sessions.retrieve(session_id)
@@ -128,7 +135,9 @@ class PaymentSuccessView(TemplateView):
 
         customer_email = session.customer_details.email
         if customer_email:
-            subject = f"Електронний чек. Замовлення №{order.id} у магазині BookShop"
+            subject = (
+                f"Електронний чек. Замовлення №{order.id} у магазині BookShop"
+            )
             message = (
                 f"Вітаємо! Ваша оплата успішно прийнята.\n\n"
                 f"Деталі замовлення:\n"
