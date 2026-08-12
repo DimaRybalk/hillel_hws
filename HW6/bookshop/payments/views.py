@@ -129,6 +129,7 @@ class PaymentSuccessView(TemplateView):
 
         if session_id:
             try:
+
                 session = client.v1.checkout.sessions.retrieve(session_id)
 
                 metadata = getattr(session, "metadata", {}) or {}
@@ -143,17 +144,19 @@ class PaymentSuccessView(TemplateView):
                     order.status = "paid"
                     order.save()
 
-                    customer_details = getattr(session, "customer_details", None)
-                    customer_email = None
-                    if customer_details:
-                        customer_email = getattr(customer_details, "email", None) or (
-                            customer_details.get("email")
-                            if isinstance(customer_details, dict)
-                            else None
-                        )
+                    try:
+                        customer_details = getattr(session, "customer_details", None)
+                        customer_email = None
+                        if customer_details:
+                            customer_email = getattr(
+                                customer_details, "email", None
+                            ) or (
+                                customer_details.get("email")
+                                if isinstance(customer_details, dict)
+                                else None
+                            )
 
-                    if customer_email:
-                        try:
+                        if customer_email:
                             subject = f"Електронний чек. Замовлення №{order.id} у магазині BookShop"
                             message = (
                                 f"Вітаємо! Ваша оплата успішно прийнята.\n\n"
@@ -170,11 +173,12 @@ class PaymentSuccessView(TemplateView):
                                 recipient_list=[customer_email],
                                 fail_silently=True,
                             )
-                        except Exception as mail_err:
-                            logger.error(f"Помилка відправки листа: {mail_err}")
+                    except Exception as mail_err:
+
+                        logger.error(f"Не вдалося відправити email: {mail_err}")
 
             except Exception as e:
-                logger.error(f"Помилка обробки успішної оплати: {e}")
+                logger.error(f"Помилка Stripe або бази даних: {e}")
 
         return super().get(request, *args, **kwargs)
 
