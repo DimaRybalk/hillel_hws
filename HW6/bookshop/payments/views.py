@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -21,8 +22,6 @@ Handles the Stripe payment flow: creating Checkout Sessions, receiving
 webhook events, and the success/cancel pages that update order status
 and email a receipt once payment is confirmed.
 """
-
-YOUR_DOMAIN = "http://localhost:8000/"
 
 # 1. Отримуємо ключ із env або settings. Якщо ключа немає — беремо тестовий заповнювач для Stripe SDK
 api_key = os.environ.get(
@@ -42,6 +41,9 @@ class CheckoutSession(View):
             order = get_object_or_404(Order, id=order_id)
             stripe_amount = int(order.total_price * 100)
 
+            success_path = reverse("payment_success")
+            cancel_path = reverse("payment_cancel")
+
             checkout_session = client.v1.checkout.sessions.create(
                 params={
                     "line_items": [
@@ -57,9 +59,9 @@ class CheckoutSession(View):
                         },
                     ],
                     "mode": "payment",
-                    "success_url": YOUR_DOMAIN
+                    "success_url": success_path
                     + "payments/success/?session_id={CHECKOUT_SESSION_ID}",
-                    "cancel_url": YOUR_DOMAIN + "payments/cancel/",
+                    "cancel_url": cancel_path + "payments/cancel/",
                     "metadata": {"order_id": str(order.id)},
                 }
             )
@@ -75,7 +77,7 @@ class CustomerPortalView(View):
         checkout_session_id = request.GET.get("session_id")
         checkout_session = client.v1.checkout.sessions.retrieve(checkout_session_id)
 
-        return_url = YOUR_DOMAIN
+        return_url = reverse("books_list")
 
         portalSession = client.v1.billing_portal.sessions.create(
             params={
