@@ -14,6 +14,7 @@ import stripe
 from stripe import StripeClient
 
 from order.models import Order
+import logging
 
 """
 Views for the `payments` app.
@@ -28,6 +29,8 @@ api_key = os.environ.get(
     "STRIPE_CLIENT_API",
     getattr(settings, "STRIPE_CLIENT_API", "sk_test_placeholder_key_for_tests"),
 )
+
+logger = logging.getLogger(__name__)
 
 # 2. Оголошуємо client прямо у модулі
 client = StripeClient(api_key)
@@ -124,33 +127,54 @@ class PaymentSuccessView(TemplateView):
     def get(self, request, *args, **kwargs):
         session_id = request.GET.get("session_id")
 
-        session = client.v1.checkout.sessions.retrieve(session_id)
+        if session_id:
+            try:
+                session = client.v1.checkout.sessions.retrieve(session_id)
 
-        order_id = session.metadata.order_id
-        order = get_object_or_404(Order, id=order_id)
+                metadata = getattr(session, "metadata", {}) or {}
+                order_id = (
+                    metadata.get("order_id")
+                    if isinstance(metadata, dict)
+                    else getattr(metadata, "order_id", None)
+                )
 
-        if order_id:
-            order.status = "paid"
-            order.save()
+                if order_id:
+                    order = get_object_or_404(Order, id=order_id)
+                    order.status = "paid"
+                    order.save()
 
-        customer_email = session.customer_details.email
-        if customer_email:
-            subject = f"Електронний чек. Замовлення №{order.id} у магазині BookShop"
-            message = (
-                f"Вітаємо! Ваша оплата успішно прийнята.\n\n"
-                f"Деталі замовлення:\n"
-                f"Номер замовлення: №{order.id}\n"
-                f"Сума оплати: {order.total_price} грн.\n\n"
-                f"Дякуємо, що обрали BookShop! Ваші книги вже готуються до відправки."
-            )
+                    customer_details = getattr(session, "customer_details", None)
+                    customer_email = None
+                    if customer_details:
+                        customer_email = getattr(customer_details, "email", None) or (
+                            customer_details.get("email")
+                            if isinstance(customer_details, dict)
+                            else None
+                        )
 
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[customer_email],
-                fail_silently=False,
-            )
+                    if customer_email:
+                        try:
+                            subject = f"Електронний чек. Замовлення №{order.id} у магазині BookShop"
+                            message = (
+                                f"Вітаємо! Ваша оплата успішно прийнята.\n\n"
+                                f"Деталі замовлення:\n"
+                                f"Номер замовлення: №{order.id}\n"
+                                f"Сума оплати: {order.total_price} грн.\n\n"
+                                f"Дякуємо, що обрали BookShop! Ваші книги вже готуються до відправки."
+                            )
+
+                            send_mail(
+                                subject=subject,
+                                message=message,
+                                from_email=settings.DEFAULT_FROM_EMAIL,
+                                recipient_list=[customer_email],
+                                fail_silently=True,
+                            )
+                        except Exception as mail_err:
+                            logger.error(f"Помилка відправки листа: {mail_err}")
+
+            except Exception as e:
+                logger.error(f"Помилка обробки успішної оплати: {e}")
 
         return super().get(request, *args, **kwargs)
 
