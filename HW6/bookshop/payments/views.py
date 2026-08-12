@@ -29,7 +29,7 @@ api_key = os.environ.get(
     getattr(settings, "STRIPE_CLIENT_API", "sk_test_placeholder_key_for_tests"),
 )
 
-# 2. Оголошуємо client прямо у модулі (це вирішує AttributeError у тестах з @patch("payments.views.client"))
+# 2. Оголошуємо client прямо у модулі
 client = StripeClient(api_key)
 
 
@@ -41,8 +41,12 @@ class CheckoutSession(View):
             order = get_object_or_404(Order, id=order_id)
             stripe_amount = int(order.total_price * 100)
 
-            success_path = reverse("payment_success")
-            cancel_path = reverse("payment_cancel")
+            # Отримуємо повні абсолютні URL з урахуванням домену та локалі (/uk/...)
+            success_url = (
+                request.build_absolute_uri(reverse("payment_success"))
+                + "?session_id={CHECKOUT_SESSION_ID}"
+            )
+            cancel_url = request.build_absolute_uri(reverse("payment_cancel"))
 
             checkout_session = client.v1.checkout.sessions.create(
                 params={
@@ -59,9 +63,8 @@ class CheckoutSession(View):
                         },
                     ],
                     "mode": "payment",
-                    "success_url": success_path
-                    + "payments/success/?session_id={CHECKOUT_SESSION_ID}",
-                    "cancel_url": cancel_path + "payments/cancel/",
+                    "success_url": success_url,
+                    "cancel_url": cancel_url,
                     "metadata": {"order_id": str(order.id)},
                 }
             )
@@ -77,7 +80,7 @@ class CustomerPortalView(View):
         checkout_session_id = request.GET.get("session_id")
         checkout_session = client.v1.checkout.sessions.retrieve(checkout_session_id)
 
-        return_url = reverse("books_list")
+        return_url = request.build_absolute_uri(reverse("books_list"))
 
         portalSession = client.v1.billing_portal.sessions.create(
             params={
