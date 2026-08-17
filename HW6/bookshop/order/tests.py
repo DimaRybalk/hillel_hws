@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.test import Client
 from unittest.mock import patch, MagicMock
 from bookshop.factories import UserFactory, BookFactory, OrderFactory
-from unittest.mock import patch
 
 
 @pytest.fixture(autouse=True)
