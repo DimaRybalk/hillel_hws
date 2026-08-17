@@ -9,6 +9,7 @@ from django.contrib import messages
 from silk.profiling.profiler import silk_profile
 from django.contrib.auth.mixins import LoginRequiredMixin
 import logging
+from bookshop.services import WarehouseClient, WarehouseServiceError
 
 """
 Views for the `basket` app.a
@@ -90,46 +91,90 @@ class SubmitCartView(LoginRequiredMixin, View):
             item["book"].id: item["quantity"] for item in cart_data["cart_items"]
         }
 
-        with transaction.atomic():
-            # Lock the relevant book rows for the duration of the transaction
-            # to prevent concurrent checkouts from overselling stock.
-            locked_books = {
-                book.id: book
-                for book in Book.objects.select_for_update().filter(id__in=book_ids)
-            }
+        warehouse = WarehouseClient()
+        warehouse_reserved = []
+        try:
+            with transaction.atomic():
+                # Lock the relevant book rows for the duration of the transaction
+                # to prevent concurrent checkouts from overselling stock.
+                locked_books = {
+                    book.id: book
+                    for book in Book.objects.select_for_update().filter(id__in=book_ids)
+                }
 
-            for book_id, quantity in requested_qty.items():
-                book = locked_books.get(book_id)
+                for book_id, quantity in requested_qty.items():
+                    book = locked_books.get(book_id)
 
-                if quantity <= 0:
-                    messages.error(
-                        request,
-                        f"Некоректна кількість для книги '{book.title if book else book_id}'.",
-                    )
-                    return redirect("cart_detail")
+                    if quantity <= 0:
+                        messages.error(
+                            request,
+                            f"Некоректна кількість для книги '{book.title if book else book_id}'.",
+                        )
+                        return redirect("cart_detail")
 
-                if book is None or book.stock < quantity:
-                    title = book.title if book else book_id
-                    available = book.stock if book else 0
-                    messages.error(
-                        request,
-                        f"Вибачте, книги '{title}' недостатньо на складі. "
-                        f"Доступно всього: {available} шт.",
-                    )
-                    return redirect("cart_detail")
+                    if book is None or book.stock < quantity:
+                        title = book.title if book else book_id
+                        available = book.stock if book else 0
+                        messages.error(
+                            request,
+                            f"Вибачте, книги '{title}' недостатньо на складі. "
+                            f"Доступно всього: {available} шт.",
+                        )
+                        return redirect("cart_detail")
 
-            order = Order.objects.create(
-                user=request.user, total_price=cart_data["cart_price"]
-            )
-
-            for book_id, quantity in requested_qty.items():
-                book = locked_books[book_id]
-                book.stock -= quantity
-                book.save()
-
-                OrderItem.objects.create(
-                    order=order, book=book, price=book.price, quantity=quantity
+                order = Order.objects.create(
+                    user=request.user, total_price=cart_data["cart_price"]
                 )
+
+                for book_id, quantity in requested_qty.items():
+                    book = locked_books[book_id]
+                    book.stock -= quantity
+                    book.save()
+
+                    OrderItem.objects.create(
+                        order=order, book=book, price=book.price, quantity=quantity
+                    )
+
+                    warehouse.reserve_book(
+                        book_id=book.id, amount=quantity, order_id=order.id
+                    )
+                    warehouse_reserved.append((book_id, quantity))
+
+        except WarehouseServiceError as exc:
+            logger.error(f"Склад ProjectB недоступний при замовленні: {exc.detail}")
+            # Знімаємо вже встановлені резерви на складі ProjectB
+            for b_id, qty in warehouse_reserved:
+                try:
+                    warehouse.release_reservation(
+                        book_id=b_id, amount=qty, order_id=order.id
+                    )
+                except Exception:
+                    pass
+
+            messages.error(
+                request,
+                "Сервіс складу тимчасово недоступний. Спробуйте пізніше.",
+            )
+            return redirect("cart_detail")
+
+        except Exception as exc:
+            logger.error(
+                f"Помилка при створенні замовлення або резервуванні: {exc}",
+                exc_info=True,
+            )
+            for b_id, qty in warehouse_reserved:
+                try:
+                    warehouse.release_reservation(
+                        book_id=b_id, amount=qty, order_id=order.id
+                    )
+                except Exception:
+                    pass
+
+            messages.error(
+                request,
+                "Не вдалося зарезервувати товари на складі. Перевірте залишки.",
+            )
+            return redirect("cart_detail")
 
         cart.clear_cart()
 

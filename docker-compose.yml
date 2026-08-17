@@ -1,0 +1,76 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGPORT: ${POSTGRES_PORT}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # Project A (Основний магазин)
+  project_a:
+    build:
+      context: ./HW6/bookshop
+      dockerfile: Dockerfile
+    volumes:
+      - ./HW6/bookshop:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=bookshop.settings.base
+      - ALLOWED_HOSTS=*
+      - DB_HOST=db
+      - DB_PORT=${POSTGRES_PORT}
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - WAREHOUSE_SERVICE_URL=http://project_b:8001
+      - WAREHOUSE_SERVICE_USER=${WAREHOUSE_SERVICE_USER}
+      - WAREHOUSE_SERVICE_PASS=${WAREHOUSE_SERVICE_PASS}
+      - STRIPE_CLIENT_API=${STRIPE_CLIENT_API}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - SECRET_KEY=${SECRET_KEY}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  # Project B (Сервіс складу)
+  project_b:
+    build:
+      context: ./ProjectB
+      dockerfile: Dockerfile
+    volumes:
+      - ./ProjectB:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=warehouse.settings.base
+      - ALLOWED_HOSTS=*
+      - DB_HOST=db
+      - DB_PORT=${POSTGRES_PORT}
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=${SECRET_KEY}
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:

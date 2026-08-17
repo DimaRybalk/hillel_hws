@@ -12,9 +12,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 import stripe
 from stripe import StripeClient
-
+from bookshop.services import WarehouseClient, WarehouseServiceError
 from order.models import Order
 import logging
+from django.db import transaction
 
 """
 Views for the `payments` app.
@@ -49,7 +50,7 @@ class CheckoutSession(View):
                 request.build_absolute_uri(reverse("payment_success"))
                 + "?session_id={CHECKOUT_SESSION_ID}"
             )
-            cancel_url = request.build_absolute_uri(reverse("payment_cancel"))
+            cancel_url = (request.build_absolute_uri(reverse("payment_cancel")) + f"?order_id={order.id}")
 
             checkout_session = client.v1.checkout.sessions.create(
                 params={
@@ -129,9 +130,7 @@ class PaymentSuccessView(TemplateView):
 
         if session_id:
             try:
-
                 session = client.v1.checkout.sessions.retrieve(session_id)
-
                 metadata = getattr(session, "metadata", {}) or {}
                 order_id = (
                     metadata.get("order_id")
@@ -141,11 +140,31 @@ class PaymentSuccessView(TemplateView):
 
                 if order_id:
                     order = get_object_or_404(Order, id=order_id)
-                    order.status = "paid"
-                    order.save()
+
+                    if getattr(order, "status", None) != "paid":
+                        warehouse = WarehouseClient()
+
+                        with transaction.atomic():
+                            for item in order.items.select_related(
+                                "book"
+                            ).all():
+                                warehouse.confirm_sale(
+                                    book_id=item.book.id,
+                                    amount=item.quantity,
+                                    order_id=order.id,
+                                )
+
+                            order.status = "paid"
+                            order.save()
+
+                        logger.info(
+                            f"Оплата замовлення #{order.id} успішна. Товари списано зі складу ProjectB."
+                        )
 
                     try:
-                        customer_details = getattr(session, "customer_details", None)
+                        customer_details = getattr(
+                            session, "customer_details", None
+                        )
                         customer_email = None
                         if customer_details:
                             customer_email = getattr(
@@ -174,14 +193,60 @@ class PaymentSuccessView(TemplateView):
                                 fail_silently=True,
                             )
                     except Exception as mail_err:
-
                         logger.error(f"Не вдалося відправити email: {mail_err}")
 
+            except WarehouseServiceError as wh_err:
+                logger.error(
+                    f"Критична помилка зв'язку зі складом після оплати: {wh_err}"
+                )
             except Exception as e:
-                logger.error(f"Помилка Stripe або бази даних: {e}")
+                logger.error(
+                    f"Помилка Stripe або обробки оплати: {e}", exc_info=True
+                )
 
         return super().get(request, *args, **kwargs)
 
 
 class PaymentCancelView(TemplateView):
     template_name = "cancel.html"
+
+    def get(self, request, *args, **kwargs):
+        order_id = request.GET.get("order_id")
+
+        if order_id:
+            try:
+                order = get_object_or_404(Order, id=order_id)
+
+                if getattr(order, "status", None) not in ["paid", "cancelled"]:
+                    warehouse = WarehouseClient()
+
+                    with transaction.atomic():
+                        for item in order.items.select_related("book").all():
+                            try:
+                                warehouse.release_reservation(
+                                    book_id=item.book.id,
+                                    amount=item.quantity,
+                                    order_id=order.id,
+                                )
+                            except Exception as rel_err:
+                                logger.error(
+                                    f"Помилка зняття броні з книги {item.book.id}: {rel_err}"
+                                )
+
+                            book = item.book
+                            book.stock += item.quantity
+                            book.save(update_fields=["stock"])
+
+                        order.status = "cancelled"
+                        order.save()
+
+                    logger.info(
+                        f"Оплату замовлення #{order.id} скасовано користувачем. Резерв на складі звільнено."
+                    )
+
+            except Exception as e:
+                logger.error(
+                    f"Помилка обробки скасування платежу: {e}", exc_info=True
+                )
+
+        return super().get(request, *args, **kwargs)

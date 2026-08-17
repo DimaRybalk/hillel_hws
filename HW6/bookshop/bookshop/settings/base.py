@@ -78,6 +78,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "silk.middleware.SilkyMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = "bookshop.urls"
@@ -168,8 +169,11 @@ LOCALE_PATHS = [
 
 # Налаштування для медіафайлів
 
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'bookshop', 'static'),
+]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -362,3 +366,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
+
+WAREHOUSE_SERVICE_URL = os.getenv('WAREHOUSE_SERVICE_URL', 'http://project_b:8001')
+WAREHOUSE_SERVICE_USER = os.getenv('WAREHOUSE_SERVICE_USER', 'shop_service')
+WAREHOUSE_SERVICE_PASS = os.getenv('WAREHOUSE_SERVICE_PASS')
