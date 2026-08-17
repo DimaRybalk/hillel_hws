@@ -35,10 +35,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    defaults:
-      run:
-        working-directory: HW6/bookshop
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -48,17 +44,21 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      # --- PROJECT A (Bookshop) ---
+      - name: Install dependencies (Project A)
+        working-directory: HW6/bookshop
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest pytest-cov
+          pip install flake8 pytest pytest-cov pytest-django
           pip install -r requirements.txt
 
-      - name: Lint with Flake8
+      - name: Lint with Flake8 (Project A)
+        working-directory: HW6/bookshop
         run: |
           flake8 .
 
-      - name: Run Tests with Pytest & Coverage
+      - name: Run Tests (Project A)
+        working-directory: HW6/bookshop
         env:
           POSTGRES_DB: test_db
           POSTGRES_USER: test_user
@@ -71,3 +71,28 @@ jobs:
           STRIPE_CLIENT_API: sk_test_placeholder_key_for_tests
         run: |
           pytest --cov=. --cov-report=xml
+
+      # --- PROJECT B (Warehouse) ---
+      - name: Install dependencies (Project B)
+        working-directory: ProjectB
+        run: |
+          pip install -r requirements.txt
+
+      - name: Lint with Flake8 (Project B)
+        working-directory: ProjectB
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+
+      - name: Run Tests (Project B)
+        working-directory: ProjectB
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          DB_HOST: localhost
+          POSTGRES_PORT: 5432
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          SECRET_KEY: django-insecure-ci-test-key
+        run: |
+          python manage.py test
