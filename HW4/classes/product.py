@@ -1,6 +1,6 @@
 class Product:
 
-    def __init__(self,name: str,category: str,price: float,quantity: int):
+    def __init__(self, name: str, category: str, price: float, quantity: int):
         self.name = name
         self.category = category
         self.price = price
@@ -12,5 +12,5 @@ class Product:
     def set_new_price(self, new_price: float):
         self.price = new_price
 
-    def set_new_quantity(self,new_quantity: int):
+    def set_new_quantity(self, new_quantity: int):
         self.quantity = new_quantity

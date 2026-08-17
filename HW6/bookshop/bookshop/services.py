@@ -22,7 +22,9 @@ class WarehouseClient:
         if not self.jwt_token:
             auth_url = f"{self.base_url}/api/user/token/"
             username = getattr(settings, "WAREHOUSE_SERVICE_USER", "shop_service")
-            password = getattr(settings, "WAREHOUSE_SERVICE_PASS", "my_secure_password_123")
+            password = getattr(
+                settings, "WAREHOUSE_SERVICE_PASS", "my_secure_password_123"
+            )
 
             payload = {
                 "username": username,
@@ -34,7 +36,9 @@ class WarehouseClient:
             }
 
             try:
-                response = requests.post(auth_url, json=payload, headers=headers, timeout=5)
+                response = requests.post(
+                    auth_url, json=payload, headers=headers, timeout=5
+                )
                 response.raise_for_status()
                 self.jwt_token = response.json().get("access")
             except requests.RequestException as e:

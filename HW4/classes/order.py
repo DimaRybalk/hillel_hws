@@ -7,10 +7,10 @@ class Order:
         self.order_list: list[Product] = []
         self.total_cost: float = 0
 
-    def add_product(self,product: "Product"):
+    def add_product(self, product: "Product"):
         self.order_list.append(product)
 
-    def delete_product(self,product: "Product"):
+    def delete_product(self, product: "Product"):
         self.order_list.pop(product)
 
     def show_order(self):
@@ -23,6 +23,5 @@ class Order:
     def calculate_total_cost(self):
         self.total_cost = 0
         for item in self.order_list:
-          self.total_cost += item.price  
+            self.total_cost += item.price
         return self.total_cost
-

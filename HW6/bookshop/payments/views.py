@@ -50,7 +50,10 @@ class CheckoutSession(View):
                 request.build_absolute_uri(reverse("payment_success"))
                 + "?session_id={CHECKOUT_SESSION_ID}"
             )
-            cancel_url = (request.build_absolute_uri(reverse("payment_cancel")) + f"?order_id={order.id}")
+            cancel_url = (
+                request.build_absolute_uri(reverse("payment_cancel"))
+                + f"?order_id={order.id}"
+            )
 
             checkout_session = client.v1.checkout.sessions.create(
                 params={
@@ -145,9 +148,7 @@ class PaymentSuccessView(TemplateView):
                         warehouse = WarehouseClient()
 
                         with transaction.atomic():
-                            for item in order.items.select_related(
-                                "book"
-                            ).all():
+                            for item in order.items.select_related("book").all():
                                 warehouse.confirm_sale(
                                     book_id=item.book.id,
                                     amount=item.quantity,
@@ -162,9 +163,7 @@ class PaymentSuccessView(TemplateView):
                         )
 
                     try:
-                        customer_details = getattr(
-                            session, "customer_details", None
-                        )
+                        customer_details = getattr(session, "customer_details", None)
                         customer_email = None
                         if customer_details:
                             customer_email = getattr(
@@ -200,9 +199,7 @@ class PaymentSuccessView(TemplateView):
                     f"Критична помилка зв'язку зі складом після оплати: {wh_err}"
                 )
             except Exception as e:
-                logger.error(
-                    f"Помилка Stripe або обробки оплати: {e}", exc_info=True
-                )
+                logger.error(f"Помилка Stripe або обробки оплати: {e}", exc_info=True)
 
         return super().get(request, *args, **kwargs)
 
@@ -245,8 +242,6 @@ class PaymentCancelView(TemplateView):
                     )
 
             except Exception as e:
-                logger.error(
-                    f"Помилка обробки скасування платежу: {e}", exc_info=True
-                )
+                logger.error(f"Помилка обробки скасування платежу: {e}", exc_info=True)
 
         return super().get(request, *args, **kwargs)

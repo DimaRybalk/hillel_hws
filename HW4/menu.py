@@ -1,10 +1,19 @@
+from menu_fucntions import (
+    add_new_order,
+    add_product_to_order,
+    change_price,
+    change_quantity,
+    delete_product_from_order,
+    exit_shop,
+    show_order,
+    show_products,
+)
 
-from menu_fucntions import add_new_order, add_product_to_order, change_price, change_quantity, delete_product_from_order, exit_shop, show_order, show_products
 
 def show_menu():
-    for key,value in menu.items():
+    for key, value in menu.items():
         print(f"{key}: {value[0]}")
-        
+
 
 def choice_validator(prompt: str):
     choices_list = [choice for choice in menu]
@@ -18,8 +27,10 @@ def choice_validator(prompt: str):
         except ValueError:
             print("Please enter a number")
 
+
 def start_task(user_choice):
     return menu[user_choice][1]()
+
 
 menu = {
     1: ("Show products", show_products),
@@ -28,6 +39,6 @@ menu = {
     4: ("Add product to order", add_product_to_order),
     5: ("Delete product from order", delete_product_from_order),
     6: ("Show order", show_order),
-    7: ("Add new order",add_new_order),
-    0: ("Exit",exit_shop)
+    7: ("Add new order", add_new_order),
+    0: ("Exit", exit_shop),
 }
