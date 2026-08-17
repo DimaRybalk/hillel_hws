@@ -4,7 +4,20 @@ from django.urls import reverse
 from django.test import Client
 from unittest.mock import patch, MagicMock
 from bookshop.factories import UserFactory, BookFactory, OrderFactory
+from unittest.mock import patch
 
+@pytest.fixture(autouse=True)
+def mock_warehouse_service():
+    with patch("bookshop.services.WarehouseClient.reserve_book") as mock_reserve, \
+         patch("bookshop.services.WarehouseClient.confirm_sale") as mock_confirm, \
+         patch("bookshop.services.WarehouseClient.release_reservation") as mock_release, \
+         patch("bookshop.services.WarehouseClient._get_auth_headers") as mock_auth:
+        
+        mock_auth.return_value = {"Authorization": "Bearer fake_token", "Host": "localhost"}
+        mock_reserve.return_value = {"status": "reserved", "amount": 1}
+        mock_confirm.return_value = {"status": "confirmed", "amount": 1}
+        mock_release.return_value = {"status": "released", "amount": 1}
+        yield
 
 @pytest.mark.django_db
 def test_order_creation_status():
